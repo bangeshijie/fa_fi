@@ -56,13 +56,15 @@ ln -sfn /opt/fa_fi_ms/frontend-releases/<commit-id>/dist /opt/fa_fi_ms/frontend-
 
 ## Nginx 和证书
 
-安装 `deploy/nginx/fa_fi_ms.conf` 到 `/etc/nginx/conf.d/`。如果证书不存在，先使用 HTTP 临时配置申请包含根域名和 www 域名的证书：
+安装 `deploy/nginx/fa_fi_ms-http.conf` 到 `/etc/nginx/conf.d/`，先使用 HTTP 配置申请包含根域名和 www 域名的证书：
 
 ```bash
-certbot --nginx -d chyichyi.com -d www.chyichyi.com
+nginx -t
+systemctl reload nginx
+certbot certonly --webroot -w /opt/fa_fi_ms/frontend-current -d chyichyi.com -d www.chyichyi.com
 ```
 
-完成后检查并 reload：
+证书申请成功后，用 `deploy/nginx/fa_fi_ms.conf` 替换 HTTP 引导配置，再检查并 reload：
 
 ```bash
 nginx -t
