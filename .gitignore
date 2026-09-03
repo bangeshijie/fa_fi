@@ -39,7 +39,6 @@ build/
 node_modules/
 .npm
 .pnpm-store/
-pnpm-lock.yaml
 package-lock.json
 yarn.lock
 dist/
