@@ -24,7 +24,7 @@ docker compose -f docker-compose.prod.yml up -d postgres redis
 docker compose -f docker-compose.prod.yml run --rm alembic-migration
 docker compose -f docker-compose.prod.yml up -d backend
 docker compose -f docker-compose.prod.yml ps
-curl -fsS http://127.0.0.1:8002/health
+curl -fsS http://127.0.0.1:8002/api/v1/common/health
 ```
 
 旧测试项目确认无保留需求后，只在旧项目目录执行：
