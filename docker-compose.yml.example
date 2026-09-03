@@ -1,0 +1,108 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: myapp-postgres
+    environment:
+      TZ: Asia/Shanghai
+      PGTZ: Asia/Shanghai
+    env_file:
+      - ./backend/env/.env.example
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      # PostgreSQL 18 的 PGDATA 位于 /var/lib/postgresql/18/docker。
+      - postgres18-data:/var/lib/postgresql
+    networks:
+      - app-network
+    restart: unless-stopped
+    command: ["postgres", "-c", "timezone=Asia/Shanghai"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fa_fi_pgdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:8.10.0-alpine
+    container_name: myapp-redis
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "127.0.0.1:6380:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - everysec
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  alembic-migration:
+    build: ./backend
+    container_name: myapp-migration
+    command: uv run alembic upgrade head
+    env_file:
+      - ./backend/env/.env.example
+    environment:
+      APP_ENV: prod
+      TZ: Asia/Shanghai
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: "no"
+
+  backend:
+    build: ./backend
+    container_name: myapp-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/env/.env.example
+    environment:
+      APP_ENV: prod
+      TZ: Asia/Shanghai
+    volumes:
+      - ./backend:/code
+      - /code/.venv
+      - upload-data:/code/static/upload
+      - download-data:/code/static/download
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      alembic-migration:
+        condition: service_completed_successfully
+    networks:
+      - app-network
+    restart: unless-stopped
+    command: uv run uvicorn main:app --host 0.0.0.0 --port 8000
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres18-data:
+    driver: local
+  redis-data:
+    driver: local
+  upload-data:
+    driver: local
+  download-data:
+    driver: local

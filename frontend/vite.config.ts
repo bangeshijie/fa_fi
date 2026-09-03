@@ -1,0 +1,67 @@
+
+
+
+// https://vite.dev/config/
+import { defineConfig, loadEnv } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import path from 'node:path'
+
+
+
+export default defineConfig(({ mode }) => {
+  // 获取各种环境下对应的变量
+  const env = loadEnv(mode, process.cwd());
+  return {
+    plugins: [
+      vue(),
+    ],
+    build: {
+      rollupOptions: {
+        output: {
+          // 手动拆分代码块
+          manualChunks: {
+            // 将大型框架单独打包
+            vue: ['vue', 'vue-router', 'pinia', 'axios'],
+            // 将大型工具库单独打包
+            charts: ['echarts'], // 假如你用了图表库
+            utils: ['lodash', 'moment'], // 假如你用了这些工具库
+          },
+        },
+      },
+    },
+
+
+    resolve: {
+      alias: {
+        '@': path.resolve(process.cwd(), 'src'),
+      },
+      extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue', '.scss', '.css']
+    },
+    // scss 全局变量
+    css: {
+      preprocessorOptions: {
+        scss: {
+
+          additionalData: `@use "@/styles/variable.scss"as *;`,
+        },
+      },
+    },
+    // 代理跨域
+    server: {
+      port: 5173,
+      open: true,
+      proxy: {
+        [env.VITE_APP_BASE_API]: {
+          target: env.VITE_SERVE,
+          changeOrigin: true,
+          
+        },
+        // 新增：代理静态文件请求
+        '/static': {
+          target: env.VITE_SERVE,  // 你的后端地址，如 http://localhost:8000
+          changeOrigin: true,
+        }
+      }
+    }
+  }
+})

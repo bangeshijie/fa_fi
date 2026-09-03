@@ -1,0 +1,153 @@
+@use './variable.scss' as *;
+@use './reset.scss' as *;
+
+/*
+ * Application theme
+ *
+ * The default surface is light and precise. Dark mode only changes semantic
+ * tokens, so pages and Element Plus components keep the same visual language.
+ */
+:root {
+  color-scheme: light;
+  --el-color-primary: #{$industrial-signal};
+  --el-color-primary-light-3: #7ea3ff;
+  --el-color-primary-light-5: #a9bfff;
+  --el-color-primary-light-7: #cbd8ff;
+  --el-color-primary-light-9: #edf1ff;
+  --el-color-primary-dark-2: #1d55cb;
+  --el-bg-color: #{$industrial-panel};
+  --el-bg-color-page: #{$industrial-bg};
+  --el-bg-color-overlay: #{$industrial-panel-raised};
+  --el-fill-color-blank: #{$industrial-panel};
+  --el-fill-color: #{$industrial-panel-raised};
+  --el-fill-color-light: #f0f3f0;
+  --el-fill-color-lighter: #f5f7f5;
+  --el-fill-color-extra-light: #fafbfa;
+  --el-fill-color-dark: #e5ebe5;
+  --el-border-color: #{$industrial-border};
+  --el-border-color-light: #c5cec6;
+  --el-border-color-lighter: #e3e9e4;
+  --el-text-color-primary: #{$industrial-text};
+  --el-text-color-regular: #3d493f;
+  --el-text-color-secondary: #{$industrial-muted};
+  --el-text-color-placeholder: #9aa59c;
+  --el-border-radius-base: 0px;
+  --el-border-radius-small: 0px;
+  --el-border-radius-round: 0px;
+  --el-box-shadow: none;
+  --el-box-shadow-light: none;
+  --el-box-shadow-lighter: none;
+  --el-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --app-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --app-mono: ui-monospace, SFMono-Regular, 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
+  --app-page-bg: #{$industrial-bg};
+  --app-surface: #{$industrial-panel};
+  --app-surface-raised: #{$industrial-panel-raised};
+  --app-border: #{$industrial-border};
+  --app-text: #{$industrial-text};
+  --app-muted: #{$industrial-muted};
+  --app-menu-bg: #eef2ee;
+  --app-menu-hover: #e4ebe4;
+  --app-menu-active: #e7eeff;
+  --app-menu-active-text: #1d55cb;
+  --app-overlay-bg: rgba(255, 255, 255, .92);
+}
+
+html.dark {
+  color-scheme: dark;
+  --el-color-primary: #8fb0ff;
+  --el-color-primary-light-3: #adc4ff;
+  --el-color-primary-light-5: #c5d5ff;
+  --el-color-primary-light-7: #dbe5ff;
+  --el-color-primary-light-9: #edf1ff;
+  --el-color-primary-dark-2: #6f96f5;
+  --el-bg-color: #121612;
+  --el-bg-color-page: #0d100e;
+  --el-bg-color-overlay: #1a201b;
+  --el-fill-color-blank: #121612;
+  --el-fill-color: #1a201b;
+  --el-fill-color-light: #202820;
+  --el-fill-color-lighter: #242d24;
+  --el-fill-color-extra-light: #283228;
+  --el-fill-color-dark: #101410;
+  --el-border-color: #303a31;
+  --el-border-color-light: #3a463b;
+  --el-border-color-lighter: #263027;
+  --el-text-color-primary: #eef4ee;
+  --el-text-color-regular: #c7d0c8;
+  --el-text-color-secondary: #9aa79b;
+  --el-text-color-placeholder: #718073;
+  --app-page-bg: #0d100e;
+  --app-surface: #121612;
+  --app-surface-raised: #1a201b;
+  --app-border: #303a31;
+  --app-text: #eef4ee;
+  --app-muted: #9aa79b;
+  --app-menu-bg: #121612;
+  --app-menu-hover: #202820;
+  --app-menu-active: rgba(143, 176, 255, .16);
+  --app-menu-active-text: #c5d5ff;
+  --app-overlay-bg: rgba(13, 16, 14, .92);
+}
+
+html,
+body,
+#app {
+  min-width: 320px;
+  min-height: 100%;
+  background: var(--app-page-bg);
+  color: var(--app-text);
+  font-family: var(--app-font);
+  font-variant-numeric: tabular-nums;
+}
+
+body { margin: 0; }
+
+/* Element Plus remains the component system; these are project-wide tokens. */
+.el-card,
+.el-dialog,
+.el-popover,
+.el-dropdown-menu,
+.el-message,
+.el-notification,
+.el-drawer {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.el-card {
+  --el-card-bg-color: var(--app-surface);
+  --el-card-border-color: var(--app-border);
+}
+
+.el-input__wrapper,
+.el-textarea__inner,
+.el-select__wrapper,
+.el-date-editor.el-input__wrapper {
+  border-radius: 0 !important;
+  box-shadow: 0 0 0 1px var(--el-border-color) inset !important;
+  background: var(--app-surface) !important;
+}
+
+.el-input__wrapper.is-focus,
+.el-textarea__inner:focus,
+.el-select__wrapper.is-focused {
+  box-shadow: 0 0 0 1px var(--el-color-primary) inset !important;
+}
+
+.el-table {
+  --el-table-bg-color: var(--app-surface);
+  --el-table-tr-bg-color: var(--app-surface);
+  --el-table-header-bg-color: var(--app-surface-raised);
+  --el-table-row-hover-bg-color: var(--app-menu-hover);
+  --el-table-border-color: var(--app-border);
+  --el-table-text-color: var(--app-text);
+  --el-table-header-text-color: var(--app-muted);
+}
+
+.el-loading-mask { background: var(--app-overlay-bg) !important; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--app-page-bg); }
+::-webkit-scrollbar-thumb { background: var(--app-border); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--el-color-primary); }

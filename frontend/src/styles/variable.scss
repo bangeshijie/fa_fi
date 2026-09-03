@@ -1,0 +1,22 @@
+// Shared design tokens. Keep this file free of emitted CSS so it can be safely
+// consumed by Vite's SCSS additionalData and component-level styles.
+$industrial-bg: #f7f8f6;
+$industrial-panel: #ffffff;
+$industrial-panel-raised: #eef2ee;
+$industrial-border: #d8e0d9;
+$industrial-text: #182019;
+$industrial-muted: #68736c;
+$industrial-signal: #23ADE5;
+
+$base-menu-width: 248px;
+$base-menu-min-width: 60px;
+$base-menu-logo-height: 58px;
+$base-menu-logo-title-fontsize: 20px;
+$base-tabbar-height: 58px;
+
+$base-slider-bg-color: $industrial-panel;
+$base-menu-text-color: $industrial-muted;
+$base-logo-text-color: $industrial-text;
+$base-hover-color: $industrial-signal;
+$base-active-color: $industrial-signal;
+$layout-main-bg-color: $industrial-bg;
