@@ -1,3 +1,5 @@
+name: fa_fi
+
 services:
   postgres:
     image: postgres:18
@@ -137,10 +139,14 @@ networks:
 
 volumes:
   postgres18-data:
+    name: fa_fi-postgres18-data
     driver: local
   redis-data:
+    name: fa_fi-redis-data
     driver: local
   upload-data:
+    name: fa_fi-upload-data
     driver: local
   download-data:
+    name: fa_fi-download-data
     driver: local

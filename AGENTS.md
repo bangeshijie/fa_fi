@@ -18,7 +18,7 @@ FA-FI-MS 是一个前后端分离的财务运营/后台管理系统，当前包�
 ## 2. 目录结构
 
 ```text
-fa_fi_ms/
+fa_fi/
 ├── backend/
 │   ├── app/
 │   │   ├── api/v1/

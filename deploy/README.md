@@ -4,12 +4,12 @@
 
 ## 首次部署
 
-服务器目录固定为 `/opt/fa_fi_ms`，前端版本目录为 `/opt/fa_fi_ms/frontend-releases`，Nginx 使用 `/opt/fa_fi_ms/frontend-current` 软链接。
+服务器目录固定为 `/opt/fa_fi`，前端版本目录为 `/opt/fa_fi/frontend-releases`，Nginx 使用 `/opt/fa_fi/frontend-current` 软链接。
 
 服务器首次准备环境文件：
 
 ```bash
-mkdir -p /opt/fa_fi_ms/backend/env /opt/fa_fi_ms/frontend-releases
+mkdir -p /opt/fa_fi/backend/env /opt/fa_fi/frontend-releases
 cp deploy/backend/.env.prod.example backend/env/.env.prod
 chmod 600 backend/env/.env.prod
 ```
@@ -64,9 +64,9 @@ pnpm run build
 将 `frontend/dist` 上传到服务器的全新版本目录，然后原子切换：
 
 ```bash
-mkdir -p /opt/fa_fi_ms/frontend-releases/<commit-id>
-# 将 dist 上传到 /opt/fa_fi_ms/frontend-releases/<commit-id>/dist
-ln -sfn /opt/fa_fi_ms/frontend-releases/<commit-id>/dist /opt/fa_fi_ms/frontend-current
+mkdir -p /opt/fa_fi/frontend-releases/<commit-id>
+# 将 dist 上传到 /opt/fa_fi/frontend-releases/<commit-id>/dist
+ln -sfn /opt/fa_fi/frontend-releases/<commit-id>/dist /opt/fa_fi/frontend-current
 ```
 
 ## Nginx 和证书
@@ -74,13 +74,13 @@ ln -sfn /opt/fa_fi_ms/frontend-releases/<commit-id>/dist /opt/fa_fi_ms/frontend-
 你已有证书时不需要 Certbot。将证书文件和私钥文件放到固定目录，并确保权限正确：
 
 ```bash
-mkdir -p /etc/nginx/ssl/fa_fi_ms
-cp <你的证书文件> /etc/nginx/ssl/fa_fi_ms/fullchain.pem
-cp <你的私钥文件> /etc/nginx/ssl/fa_fi_ms/privkey.pem
-chmod 600 /etc/nginx/ssl/fa_fi_ms/privkey.pem
+mkdir -p /etc/nginx/ssl/fa_fi
+cp <你的证书文件> /etc/nginx/ssl/fa_fi/fullchain.pem
+cp <你的私钥文件> /etc/nginx/ssl/fa_fi/privkey.pem
+chmod 600 /etc/nginx/ssl/fa_fi/privkey.pem
 ```
 
-证书必须覆盖 `chyichyi.com` 和 `www.chyichyi.com`。将 `deploy/nginx/fa_fi_ms.conf` 安装到 `/etc/nginx/conf.d/`；证书不存在时才使用 `fa_fi_ms-http.conf` 作为临时 HTTP 配置：
+证书必须覆盖 `chyichyi.com` 和 `www.chyichyi.com`。将 `deploy/nginx/fa_fi.conf` 安装到 `/etc/nginx/conf.d/`；证书不存在时才使用 `fa_fi-http.conf` 作为临时 HTTP 配置：
 
 ```bash
 nginx -t
