@@ -35,6 +35,21 @@ docker compose down --volumes --remove-orphans
 
 不要对新项目执行 `down --volumes`。
 
+## 本地访问数据库和 Redis
+
+PostgreSQL 和 Redis 只绑定云服务器的 `127.0.0.1`，不会直接暴露到公网。本地电脑需要保持 SSH 隧道打开：
+
+```bash
+ssh -N \
+  -L 15432:127.0.0.1:5432 \
+  -L 16379:127.0.0.1:6379 \
+  susan@<服务器IP>
+```
+
+本地客户端连接 PostgreSQL 时使用 `127.0.0.1:15432`，连接 Redis 时使用 `127.0.0.1:16379`。数据库名、用户名和密码读取服务器上的 `backend/env/.env.prod`；Redis 还需要填写 `REDIS_PASSWORD`。
+
+如果本地 5432 或 6379 端口没有冲突，也可以将 SSH 隧道的本地端口改成同名端口。
+
 ## 发布前端
 
 在本地或构建机使用仓库根目录的 `.nvmrc` 和 `frontend/package.json` 中固定的 pnpm 版本：

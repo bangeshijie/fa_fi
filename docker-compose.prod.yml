@@ -1,6 +1,8 @@
 services:
   postgres:
     image: postgres:18
+    ports:
+      - "127.0.0.1:5432:5432"
     environment:
       TZ: Asia/Shanghai
       PGTZ: Asia/Shanghai
@@ -33,6 +35,8 @@ services:
 
   redis:
     image: redis:8.10.0-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
     environment:
       TZ: Asia/Shanghai
     env_file:
