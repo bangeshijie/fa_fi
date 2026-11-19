@@ -13,3 +13,5 @@ export const FormTypeEnum: Record<string, OptionType> = {
   DATE_TIME: { value: 9, label: "日期时间框" },
   HIDDEN: { value: 10, label: "隐藏域" },
 };
+
+

@@ -2,7 +2,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { constantRoutes } from './routes'
 
-export const HOME_PAGE_PATH = "home";
+export const HOME_PAGE_PATH = "/home";
+export const ABOUT_PAGE_PATH = "/about";
 //创建路由对象
 export const router = createRouter({
     //配置路由规则

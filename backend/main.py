@@ -112,6 +112,9 @@ def register_routers(app: FastAPI) -> None:
     """注册路由"""
 
     from app.api.v1.module_common import common_router
+    from app.api.v1.module_budget import budget_router
+    from app.api.v1.module_dimension import dimension_router
+    from app.api.v1.module_financial import financial_router
     from app.api.v1.module_monitor import monitor_router
     from app.api.v1.module_system import system_router
 
@@ -119,6 +122,9 @@ def register_routers(app: FastAPI) -> None:
     # 业务路由（暂时不带速率限制）
 
     app.include_router(common_router, prefix=api_prefix)
+    app.include_router(dimension_router, prefix=api_prefix)
+    app.include_router(financial_router, prefix=api_prefix)
+    app.include_router(budget_router, prefix=api_prefix)
     app.include_router(system_router, prefix=api_prefix)
     app.include_router(monitor_router, prefix=api_prefix)
 

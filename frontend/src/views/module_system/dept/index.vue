@@ -2,8 +2,10 @@
   <section class="admin-page">
     <header class="page-heading">
       <div>
-        <p class="eyebrow">SYSTEM / ORGANIZATION</p>
-        <h1>部门管理</h1>
+        <div class="heading-title-row">
+          <h2>部门管理</h2>
+          <p class="eyebrow">SYSTEM / ORGANIZATION</p>
+        </div>
         <p class="heading-copy">维护组织层级、部门负责人和数据权限范围。搜索会保留父级路径与全部子部门。</p>
       </div>
       <div class="heading-actions">
@@ -286,13 +288,6 @@ onMounted(loadData)
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .12em;
-}
-
-h1 {
-  margin: 8px 0 0;
-  font-size: clamp(28px, 4vw, 46px);
-  letter-spacing: -.045em;
-  line-height: 1;
 }
 
 .heading-copy,

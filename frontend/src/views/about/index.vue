@@ -1,11 +1,12 @@
 <template>
   <div class="project-container">
     <!-- 项目头部信息卡片 -->
-    <el-card class="header-card" shadow="hover">
+    <el-card class="header-card" shadow="never">
       <div class="header-content">
         <div class="project-title">
-          <h1>{{ setting.title }}</h1>
-          <el-tag type="success" effect="dark" class="version-tag">v{{ setting.version }}</el-tag>
+          <h2>{{ setting.title }}</h2>
+          <p class="eyebrow">ABOUT / PLATFORM</p>
+          <el-tag type="primary" effect="plain" class="version-tag">v{{ setting.version }}</el-tag>
         </div>
         <p class="project-desc">{{ projectInfo.description }}</p>
 
@@ -43,8 +44,8 @@
               <el-collapse-item name="1">
                 <template #title>
                   <div class="changelog-summary">
-                    <span v-if="release.features.length">✨ 新增 {{ release.features.length }} 项</span>
-                    <span v-if="release.fixes.length" class="fix-count">🐛 修复 {{ release.fixes.length }} 项</span>
+                    <span v-if="release.features.length">新增 {{ release.features.length }} 项</span>
+                    <span v-if="release.fixes.length" class="fix-count">修复 {{ release.fixes.length }} 项</span>
                   </div>
                 </template>
 
@@ -141,34 +142,50 @@ const getTagType = (type: string) => {
 </script>
 
 <style scoped lang="scss">
-// 变量定义
-$primary-color: #409eff;
-$text-color-regular: #606266;
-$border-color: #dcdfe6;
-
 .project-container {
   max-width: 900px;
-
-  padding: 0 20px;
+  padding: 14px 20px 36px;
+  color: var(--app-text);
 
   .header-card {
     margin-bottom: 30px;
-    border-radius: 10px;
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
 
     .header-content {
       padding: 10px 0;
 
       .project-title {
-        display: flex;
-        align-items: center;
-        gap: 15px;
+        white-space: nowrap;
         margin-bottom: 15px;
 
-        h1 {
+        h2,
+        .eyebrow,
+        .version-tag {
+          display: inline-block;
+          vertical-align: baseline;
+        }
+
+        h2 {
           margin: 0;
-          font-size: 28px;
-          color: #303133;
+          color: var(--app-text);
+          font-size: clamp(22px, 3vw, 32px);
           font-weight: 600;
+          letter-spacing: -.035em;
+          line-height: 1.1;
+        }
+
+        .eyebrow {
+          margin-left: 20px;
+          color: var(--el-color-primary);
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        .version-tag {
+          margin-left: 12px;
         }
 
         .version-tag {
@@ -177,7 +194,7 @@ $border-color: #dcdfe6;
       }
 
       .project-desc {
-        color: $text-color-regular;
+        color: var(--app-muted);
         line-height: 1.6;
         margin-bottom: 20px;
         font-size: 16px;
@@ -190,9 +207,9 @@ $border-color: #dcdfe6;
         margin-bottom: 25px;
 
         .tech-item {
-          background-color: #f4f4f5;
-          color: #909399;
-          border: none;
+          background-color: var(--el-color-primary-light-9);
+          color: var(--el-color-primary);
+          border-color: var(--el-color-primary-light-7);
           font-weight: 500;
         }
       }
@@ -200,16 +217,44 @@ $border-color: #dcdfe6;
       .action-buttons {
         display: flex;
         gap: 15px;
+
+        :deep(.el-button) {
+          border-radius: 0;
+        }
+
+        :deep(.el-button:not(.el-button--primary)) {
+          border-color: var(--app-border);
+          color: var(--app-text);
+        }
+
+        :deep(.el-button:not(.el-button--primary):hover),
+        :deep(.el-button:not(.el-button--primary):focus-visible) {
+          border-color: var(--el-color-primary);
+          color: var(--el-color-primary);
+          background: var(--el-color-primary-light-9);
+        }
+
+        :deep(.el-button--primary:hover),
+        :deep(.el-button--primary:focus-visible) {
+          background: var(--el-color-primary-dark-2);
+          border-color: var(--el-color-primary-dark-2);
+        }
       }
     }
   }
 
   .history-card {
-    border-radius: 10px;
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
+
+    :deep(.el-card__header) {
+      border-bottom-color: var(--app-border);
+    }
 
     .card-header {
       font-size: 18px;
       font-weight: bold;
+      color: var(--app-text);
     }
 
     .custom-timeline {
@@ -233,13 +278,13 @@ $border-color: #dcdfe6;
           h3 {
             margin: 0;
             font-size: 18px;
-            color: #303133;
+            color: var(--app-text);
           }
         }
 
         .changelog-summary {
           font-size: 14px;
-          color: $text-color-regular;
+          color: var(--app-muted);
           width: 100%;
 
           .fix-count {
@@ -249,8 +294,7 @@ $border-color: #dcdfe6;
 
         .changelog-details {
           padding: 10px 10px 0;
-
-          border-radius: 4px;
+          background: var(--app-surface-raised);
 
           .change-section {
             margin-bottom: 15px;
@@ -258,15 +302,15 @@ $border-color: #dcdfe6;
             h4 {
               margin: 0 0 10px 0;
               font-size: 14px;
-              color: #303133;
-              border-left: 3px solid rgb(206, 10, 180);
+              color: var(--app-text);
+              border-left: 3px solid var(--el-color-primary);
               padding-left: 8px;
             }
 
             ul {
               margin: 0;
               padding-left: 20px;
-              color: $text-color-regular;
+              color: var(--app-muted);
 
               li {
                 margin-bottom: 6px;

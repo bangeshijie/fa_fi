@@ -45,6 +45,20 @@ export function greetings(): string {
 }
 
 /**
+ * 获取当前日期所在月份的上一个自然月。
+ *
+ * 使用 Date 的月份溢出能力处理一月回退到上一年十二月的场景，
+ * 供列表筛选、分析口径和默认表单值统一使用。
+ */
+export function getPreviousMonthPeriod(date: Date = new Date()): { year: number; month: number } {
+  const previousMonth = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+  return {
+    year: previousMonth.getFullYear(),
+    month: previousMonth.getMonth() + 1,
+  };
+}
+
+/**
  * 获取日期范围内的所有日期
  *
  * 根据起始日期和结束日期，生成期间所有日期的字符串数组

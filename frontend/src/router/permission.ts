@@ -24,7 +24,7 @@ import type {
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 
-import { router } from "@/router";
+import { ABOUT_PAGE_PATH, HOME_PAGE_PATH, router } from "@/router";
 import setting from "../setting";
 
 import pinia from "../store";
@@ -396,6 +396,25 @@ export function generateRoutes(
             parentPath
                 ? `${parentPath}/${currentPath}`
                 : currentPath;
+
+        /**
+         * Home 是固定路由，不再从后端权限菜单生成。
+         *
+         * 兼容后端尚未删除旧 Home 菜单的情况，按完整路径和名称双重
+         * 过滤，避免覆盖或重复注册常量路由。
+         */
+        if (
+            fullPath === HOME_PAGE_PATH ||
+            fullPath === ABOUT_PAGE_PATH ||
+            item.route_name === 'Home' ||
+            item.name === 'Home' ||
+            item.route_name === 'About' ||
+            item.name === '关于' ||
+            item.name === 'About'
+        ) {
+            console.info('[Router] 跳过后端固定菜单，使用常量路由', fullPath);
+            continue;
+        }
 
 
         /**
@@ -806,6 +825,18 @@ export function addDynamicRoutes(
      */
     for (const route of routes) {
 
+        /** Home 已由 constantRoutes 注册，动态路由不重复添加。 */
+        if (
+            route.path === HOME_PAGE_PATH ||
+            route.path === HOME_PAGE_PATH.slice(1) ||
+            route.path === ABOUT_PAGE_PATH ||
+            route.path === ABOUT_PAGE_PATH.slice(1) ||
+            route.name === 'Home' ||
+            route.name === 'About'
+        ) {
+            continue;
+        }
+
         /**
          * Vue Router 动态路由必须有 name。
          *
@@ -1214,16 +1245,10 @@ router.beforeEach(
          *
          * 这里非常重要。
          *
-         * 不使用：
-         *
-         * Object.keys(authStore.info).length
-         *
-         * 判断是否初始化。
+         * 不使用： Object.keys(authStore.info).length 判断是否初始化。
          *
          *
-         * 因为：
-         *
-         * 浏览器刷新后：
+         * 因为：浏览器刷新后：
          *
          * accessToken
          *     ↓
@@ -1233,9 +1258,7 @@ router.beforeEach(
          *     ↓
          *     有
          *
-         * 但是：
-         *
-         * Vue Router 动态路由
+         * 但是： Vue Router 动态路由
          *     ↓
          *     没有
          *

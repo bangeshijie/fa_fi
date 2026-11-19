@@ -1,9 +1,10 @@
 import builtins
 from collections.abc import Sequence
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from pydantic import BaseModel
-from sqlalchemy import asc, delete, desc, false, func, select, update
+from sqlalchemy import and_, asc, delete, desc, false, func, or_, select, update
 from sqlalchemy import inspect as sa_inspect
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.elements import ColumnElement
@@ -213,6 +214,22 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             }
         except Exception as e:
             raise CustomException(msg=f"分页查询失败: {e!s}")
+
+    async def sum_crud(self, field: str, search: dict | None = None) -> Decimal:
+        """按当前查询条件和数据权限汇总指定数值字段。"""
+
+        try:
+            column = getattr(self.model, field)
+            conditions = await self.__build_conditions(**(search or {}))
+            sql = select(func.coalesce(func.sum(column), 0)).select_from(self.model).where(
+                *conditions
+            )
+            sql = await self.__filter_permissions(sql)
+            result = await self.auth.db.execute(sql)
+            value = result.scalar_one()
+            return value if isinstance(value, Decimal) else Decimal(str(value or 0))
+        except Exception as e:
+            raise CustomException(msg=f"汇总查询失败: {e!s}")
 
     async def create(self, data: CreateSchemaType | dict) -> ModelType:
         """
@@ -479,9 +496,32 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         if hasattr(self.model, "is_deleted"):
             conditions.append(getattr(self.model, "is_deleted") == False)
 
+        def build_or_condition(groups: Any) -> ColumnElement:
+            or_conditions = []
+            for group in groups if isinstance(groups, list) else []:
+                if not isinstance(group, dict):
+                    continue
+                group_conditions = []
+                for group_key, group_value in group.items():
+                    group_attr = getattr(self.model, group_key)
+                    if isinstance(group_value, tuple):
+                        group_seq, group_val = group_value
+                        if group_seq in {"eq", "=="}:
+                            group_conditions.append(group_attr == group_val)
+                        elif group_seq == "in":
+                            group_conditions.append(group_attr.in_(group_val))
+                    elif group_value is not None and group_value != "":
+                        group_conditions.append(group_attr == group_value)
+                if group_conditions:
+                    or_conditions.append(and_(*group_conditions))
+            return or_(*or_conditions) if or_conditions else false()
 
         for key, value in kwargs.items():
             if value is None or value == "":
+                continue
+
+            if isinstance(value, tuple) and value[0] == "or":
+                conditions.append(build_or_condition(value[1]))
                 continue
 
             attr = getattr(self.model, key)

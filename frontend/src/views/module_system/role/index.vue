@@ -2,8 +2,10 @@
     <section class="admin-page">
         <header class="page-heading">
             <div>
-                <p class="eyebrow">系统权限</p>
-                <h1>角色管理</h1>
+                <div class="heading-title-row">
+                    <h2>角色管理</h2>
+                    <p class="eyebrow">系统权限</p>
+                </div>
                 <p class="heading-copy">维护角色身份、数据范围和菜单访问权限。</p>
             </div>
             <div class="heading-index">02 / ROLES</div>
@@ -912,13 +914,6 @@ onMounted(async () => {
     font-size: 11px;
     font-weight: 700;
     letter-spacing: .12em;
-}
-
-h1 {
-    margin: 8px 0 0;
-    font-size: clamp(28px, 4vw, 46px);
-    letter-spacing: -.045em;
-    line-height: 1;
 }
 
 .heading-copy {

@@ -65,7 +65,7 @@ export function validateTelPhone(value: string): boolean {
 
 export function validateAccount(value: string): boolean {
   if (!value || typeof value !== "string") return false;
-  const accountRegex = /^[a-zA-Z][a-zA-Z0-9_]{4,19}$/;
+  const accountRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{3,31}$/;
   return accountRegex.test(value.trim());
 }
 

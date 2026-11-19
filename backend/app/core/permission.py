@@ -1,6 +1,6 @@
 from typing import Any
 
-from sqlalchemy import false, or_, select
+from sqlalchemy import and_, false, or_, select
 from sqlalchemy.sql.elements import ColumnElement
 
 from app.api.v1.module_system.auth.schema import AuthSchema
@@ -17,6 +17,7 @@ data_scope = 这个身份看到多大范围
 
 四个维度分开。
 """
+
 
 class Permission:
     """
@@ -66,7 +67,8 @@ class Permission:
         根据模型的权限过滤策略，选择合适的过滤方法
         """
         # 如果不需要检查数据权限,则不限制
-        if not self.auth.user:
+        user = self.auth.user
+        if user is None:
             return None
 
         # 如果检查数据权限为False,则不限制 (比如后台定时任务)
@@ -74,11 +76,13 @@ class Permission:
             return None
 
         # 超级管理员可以查看所有数据
-        if self.auth.user.is_superuser:
+        if user.is_superuser:
             return None
 
         # 获取模型的权限过滤策略
-        strategy = getattr(self.model, "__permission_strategy__", PermissionFilterStrategy.DATA_SCOPE)
+        strategy = getattr(
+            self.model, "__permission_strategy__", PermissionFilterStrategy.DATA_SCOPE
+        )
 
         # 根据策略选择过滤方法
         if strategy == PermissionFilterStrategy.ROLE_BASED:
@@ -89,8 +93,83 @@ class Permission:
             return await self.__filter_by_self_only()
         elif strategy == PermissionFilterStrategy.USER_ROLE:
             return await self.__filter_by_user_role()
+        elif strategy == PermissionFilterStrategy.MASTER_DATA:
+            return None
+        elif strategy == PermissionFilterStrategy.COST_CENTER_BASED:
+            return await self.__filter_by_cost_center_based()
         else:
             return await self.__filter_by_data_scope()
+
+    async def __filter_by_cost_center_based(self) -> ColumnElement | None:
+        """按业务数据的成本中心所属部门应用数据范围。"""
+        user = self.auth.user
+        if user is None:
+            return None
+
+        from app.api.v1.module_dimension.cost_center.model import CostCenterModel
+
+        created_id_attr = getattr(self.model, "created_id", None)
+        cost_center_id_attr = getattr(self.model, "cost_center_id", None)
+        if cost_center_id_attr is None:
+            return await self.__filter_by_data_scope()
+
+        roles = [
+            role
+            for role in (getattr(user, "roles", []) or [])
+            if role and role.status == "0"
+        ]
+        if not roles:
+            return (
+                created_id_attr == user.id if created_id_attr is not None else false()
+            )
+
+        data_scopes = {role.data_scope for role in roles}
+        custom_dept_ids = {
+            dept.id
+            for role in roles
+            if role.data_scope == self.DATA_SCOPE_CUSTOM
+            and getattr(role, "depts", None)
+            for dept in role.depts
+        }
+
+        if self.DATA_SCOPE_ALL in data_scopes:
+            return None
+
+        accessible_dept_ids = await self.__get_accessible_dept_ids(
+            data_scopes, custom_dept_ids
+        )
+        conditions: list[ColumnElement] = []
+        if accessible_dept_ids:
+            cost_center_scope = cost_center_id_attr.in_(
+                select(CostCenterModel.id).where(
+                    CostCenterModel.dept_id.in_(list(accessible_dept_ids))
+                )
+            )
+            # 成本中心允许为空；没有业务归属时，按创建人部门兜底，避免 SAP 无成本中心明细被误隐藏。
+            if created_id_attr is not None:
+                cost_center_scope = or_(
+                    cost_center_scope,
+                    and_(
+                        cost_center_id_attr.is_(None),
+                        created_id_attr.in_(
+                            select(UserModel.id).where(
+                                UserModel.dept_id.in_(list(accessible_dept_ids))
+                            )
+                        ),
+                    ),
+                )
+            conditions.append(cost_center_scope)
+        if self.DATA_SCOPE_SELF in data_scopes and created_id_attr is not None:
+            conditions.append(created_id_attr == user.id)
+        if conditions:
+            return or_(*conditions)
+        if data_scopes & {
+            self.DATA_SCOPE_CUSTOM,
+            self.DATA_SCOPE_DEPT,
+            self.DATA_SCOPE_DEPT_AND_CHILD,
+        }:
+            return false()
+        return created_id_attr == user.id if created_id_attr is not None else false()
 
     async def __filter_by_role_based(self) -> ColumnElement | None:
         """
@@ -100,7 +179,7 @@ class Permission:
         """
         # 获取用户角色 ID, or []是因为 getattr 的默认值只在属性不存在时生效，如果属性存在但值是 None，还是会返回 None。
         roles = getattr(self.auth.user, "roles", []) or []
-        # 用户无角色,用ID兜底,食用油模型都会有id属性,永远为false
+        # 用户无角色,用ID兜底,所有模型都会有id属性,永远为false
         if not roles:
             id_attr = getattr(self.model, "id", None)
             if id_attr is not None:
@@ -167,7 +246,11 @@ class Permission:
 
         for role in roles:
             data_scopes.add(role.data_scope)
-            if role.data_scope == self.DATA_SCOPE_CUSTOM and hasattr(role, "depts") and role.depts:
+            if (
+                role.data_scope == self.DATA_SCOPE_CUSTOM
+                and hasattr(role, "depts")
+                and role.depts
+            ):
                 custom_dept_ids.update(dept.id for dept in role.depts)
 
         # 全部数据权限最高优先级
@@ -175,7 +258,9 @@ class Permission:
             return None
 
         # 收集所有可访问的部门ID
-        accessible_dept_ids = await self.__get_accessible_dept_ids(data_scopes, custom_dept_ids)
+        accessible_dept_ids = await self.__get_accessible_dept_ids(
+            data_scopes, custom_dept_ids
+        )
 
         # 根据模型类型过滤
         if self.model.__name__ == "DeptModel":
@@ -190,8 +275,9 @@ class Permission:
         仅本人数据权限过滤
         """
         created_id_attr = getattr(self.model, "created_id", None)
-        if created_id_attr is not None and self.auth.user:
-            return created_id_attr == self.auth.user.id
+        user = self.auth.user
+        if created_id_attr is not None and user is not None:
+            return created_id_attr == user.id
         return None
 
     async def __filter_by_data_scope(self) -> ColumnElement | None:
@@ -200,6 +286,10 @@ class Permission:
 
         适用于大多数业务模型
         """
+        user = self.auth.user
+        if user is None:
+            return None
+
         # 如果模型没有创建人created_id字段,则不限制
         if not hasattr(self.model, "created_id"):
             return None
@@ -208,15 +298,9 @@ class Permission:
             return None
 
         # 如果用户没有角色,则只能查看自己的数据
-        roles = [
-            role
-            for role in (getattr(self.auth.user, "roles", []) or [])
-            if role and role.status == "0"
-        ]
+        roles = [role for role in (user.roles or []) if role and role.status == "0"]
         if not roles:
-            if self.auth.user:
-                return created_id_attr == self.auth.user.id
-            return None
+            return created_id_attr == user.id
 
         # 获取用户所有角色的权限范围
         data_scopes = set()
@@ -224,7 +308,11 @@ class Permission:
 
         for role in roles:
             data_scopes.add(role.data_scope)
-            if role.data_scope == self.DATA_SCOPE_CUSTOM and hasattr(role, "depts") and role.depts:
+            if (
+                role.data_scope == self.DATA_SCOPE_CUSTOM
+                and hasattr(role, "depts")
+                and role.depts
+            ):
                 custom_dept_ids.update(dept.id for dept in role.depts)
 
         # 全部数据权限最高优先级
@@ -232,7 +320,9 @@ class Permission:
             return None
 
         # 收集所有可访问的部门ID
-        accessible_dept_ids = await self.__get_accessible_dept_ids(data_scopes, custom_dept_ids)
+        accessible_dept_ids = await self.__get_accessible_dept_ids(
+            data_scopes, custom_dept_ids
+        )
 
         # 多个角色的权限按并集处理：部门范围和“仅本人”都不能互相覆盖。
         conditions: list[ColumnElement] = []
@@ -257,7 +347,7 @@ class Permission:
 
         # 处理仅本人数据权限，并与部门范围做 OR 合并。
         if self.DATA_SCOPE_SELF in data_scopes:
-            conditions.append(created_id_attr == self.auth.user.id)
+            conditions.append(created_id_attr == user.id)
 
         if conditions:
             return or_(*conditions)
@@ -271,7 +361,7 @@ class Permission:
             return false()
 
         # 默认情况：只能查看自己的数据
-        return created_id_attr == self.auth.user.id
+        return created_id_attr == user.id
 
     async def __get_accessible_dept_ids(
         self, data_scopes: set, custom_dept_ids: set
@@ -304,14 +394,18 @@ class Permission:
                 dept_result = await self.auth.db.execute(dept_sql)
                 dept_objs = dept_result.scalars().all()
                 id_map = get_child_id_map(dept_objs)
-                dept_with_children_ids = get_child_recursion(id=user_dept_id, id_map=id_map)
+                dept_with_children_ids = get_child_recursion(
+                    id=user_dept_id, id_map=id_map
+                )
                 accessible_dept_ids.update(dept_with_children_ids)
             except Exception:
                 accessible_dept_ids.add(user_dept_id)
 
         return accessible_dept_ids
 
-    def __filter_dept_model(self, accessible_dept_ids: set[int]) -> ColumnElement | None:
+    def __filter_dept_model(
+        self, accessible_dept_ids: set[int]
+    ) -> ColumnElement | None:
         """
         过滤部门模型
         """
@@ -340,7 +434,9 @@ class Permission:
                 return id_attr == user_dept_id
         return None
 
-    def __filter_user_model(self, accessible_dept_ids: set[int]) -> ColumnElement | None:
+    def __filter_user_model(
+        self, accessible_dept_ids: set[int]
+    ) -> ColumnElement | None:
         """
         过滤用户模型
         """

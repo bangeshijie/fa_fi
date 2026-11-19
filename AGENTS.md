@@ -23,6 +23,9 @@ fa_fi/
 │   ├── app/
 │   │   ├── api/v1/
 │   │   │   ├── module_common/       # 通用文件、健康检查
+│   │   │   ├── module_dimension/    # 公司、成本中心、会计科目等主数据
+│   │   │   ├── module_financial/    # 会计凭证明细、费用分析等财务业务数据
+│   │   │   ├── module_budget/       # 预算明细等预算业务数据
 │   │   │   ├── module_monitor/      # 在线用户、缓存、资源、服务器监控
 │   │   │   └── module_system/       # 认证、用户、部门、角色、菜单等
 │   │   ├── common/                  # 常量、枚举、请求/响应约定
@@ -113,8 +116,10 @@ docker compose down
 
 `backend/main.py` 创建 FastAPI 应用，并注册：
 
-- 健康检查：`/`、`/health`。
+- 健康检查：`/api/v1/common/health`、`/api/v1/common/health/live`、`/api/v1/common/health/ready`。
 - 通用路由：`/api/v1/common/file`、`/api/v1/common/health`。
+- 主数据路由：`/api/v1/dimension/company`、`/api/v1/dimension/cost-center`、`/api/v1/dimension/accounting-subject`，公司、成本中心、会计科目等主数据统一放在 `module_dimension`。
+- 财务路由：`/api/v1/financial/accounting-voucher-detail`、`/api/v1/financial/expense-analysis`；预算路由：`/api/v1/budget/budget-detail`。`module_financial` 与 `module_budget` 均和 `module_dimension` 平行。
 - 系统路由：`/api/v1/system/...`。
 - 监控路由：`/api/v1/monitor/...`。
 
@@ -324,8 +329,8 @@ module_system:user:delete
 
 ## 12. 前端页面和 API 约定
 
-- 页面按 `src/views/module_system/<模块>` 或 `src/views/module_monitor/<模块>` 组织。
-- API 按同样的模块边界放在 `src/api/module_system`、`src/api/module_monitor`。
+- 页面按 `src/views/module_system/<模块>`、`src/views/module_monitor/<模块>`、`src/views/module_dimension/<模块>`、`src/views/module_financial/<模块>` 或 `src/views/module_budget/<模块>` 组织。
+- API 按同样的模块边界放在 `src/api/module_system`、`src/api/module_monitor`、`src/api/module_dimension`、`src/api/module_financial`、`src/api/module_budget`。
 - 查询页面通常维护 `page_no`、`page_size` 和查询条件；导出接口若设计为全部导出，应明确传递筛选条件，不要把分页参数误当成导出范围。
 - 时间、下载、响应错误处理应复用 `src/utils`，不要在每个页面重新实现 Token、文件名解析或错误提示。
 - 当前监控页面包括 `cache/index.vue`、`online/index.vue`、`resource/index.vue`、`server/index.vue`，风格使用 Element Plus 卡片/表格和项目 CSS 变量。

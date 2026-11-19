@@ -2,9 +2,11 @@
   <section class="profile-page">
     <header class="page-heading">
       <div>
-        <p class="eyebrow">个人中心</p>
+        <div class="heading-title-row">
+          <h2>个人中心</h2>
+          <p class="eyebrow">PROFILE</p>
+        </div>
       </div>
-      <div class="heading-index">01 / PROFILE</div>
     </header>
 
     <div class="profile-grid">
@@ -286,7 +288,7 @@ onMounted(loadSexOptions)
 .profile-page {
   min-height: 100%;
   padding: 14px 4px 36px;
-  color: $industrial-text;
+  color: var(--app-text);
   font-family: var(--el-font-family);
 }
 
@@ -302,44 +304,29 @@ onMounted(loadSexOptions)
 
 .page-heading {
   padding: 6px 0 24px;
-  border-bottom: 1px solid $industrial-border;
+  border-bottom: 1px solid var(--app-border);
 }
 
 .eyebrow,
-.section-index,
-.heading-index {
+.section-index {
   margin: 0;
-  color: $industrial-signal;
+  color: var(--el-color-primary);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .12em;
   text-transform: uppercase;
 }
 
-h1,
 h2,
 h3,
 p {
   margin: 0;
 }
 
-h1 {
-  margin-top: 6px;
-  font-size: clamp(30px, 4vw, 52px);
-  font-weight: 700;
-  letter-spacing: -.045em;
-  line-height: 1;
-}
-
 .heading-copy {
   margin-top: 10px;
-  color: $industrial-muted;
+  color: var(--app-muted);
   font-size: 14px;
-}
-
-.heading-index {
-  color: $industrial-muted;
-  letter-spacing: .08em;
 }
 
 .profile-grid {
@@ -350,8 +337,8 @@ h1 {
 }
 
 .profile-card {
-  border: 1px solid $industrial-border;
-  background: $industrial-panel;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
 }
 
 .identity-card,
@@ -363,7 +350,7 @@ h1 {
 .card-heading {
   align-items: flex-start;
   padding-bottom: 20px;
-  border-bottom: 1px solid $industrial-border;
+  border-bottom: 1px solid var(--app-border);
 }
 
 h2 {
@@ -373,7 +360,7 @@ h2 {
 }
 
 .required-note {
-  color: #8a929c;
+  color: var(--app-muted);
   font-size: 12px;
 }
 
@@ -392,8 +379,8 @@ h2 {
   overflow: hidden;
   border: 0;
   border-radius: 0;
-  background: $industrial-signal;
-  color: #0b0c0a;
+  background: var(--el-color-primary);
+  color: var(--app-text);
   cursor: pointer;
 }
 
@@ -420,7 +407,7 @@ h2 {
   justify-content: center;
   gap: 5px;
   padding: 8px 4px;
-  background: rgba(11, 12, 10, .86);
+  background: var(--app-overlay-bg);
   font-size: 11px;
   opacity: 0;
   transition: opacity .2s ease;
@@ -443,7 +430,7 @@ h2 {
 
 .identity-copy>p {
   margin-top: 6px;
-  color: $industrial-muted;
+  color: var(--app-muted);
   font-size: 13px;
 }
 
@@ -453,7 +440,7 @@ h2 {
   align-items: center;
   gap: 8px;
   margin-top: 24px;
-  color: $industrial-text;
+  color: var(--app-text);
   font-size: 12px;
 }
 
@@ -461,7 +448,7 @@ h2 {
   width: 4px;
   height: 4px;
   border-radius: 0;
-  background: $industrial-signal;
+  background: var(--el-color-primary);
 }
 
 .upload-note {
@@ -469,13 +456,13 @@ h2 {
   align-items: center;
   gap: 7px;
   padding-top: 18px;
-  border-top: 1px solid $industrial-border;
-  color: $industrial-muted;
+  border-top: 1px solid var(--app-border);
+  color: var(--app-muted);
   font-size: 12px;
 }
 
 .upload-note .el-icon {
-  color: $industrial-signal;
+  color: var(--el-color-primary);
 }
 
 .profile-form {
@@ -494,7 +481,7 @@ h2 {
 
 .profile-form :deep(.el-form-item__label) {
   padding-bottom: 6px;
-  color: $industrial-text;
+  color: var(--app-text);
   font-size: 12px;
   line-height: 1;
 }
@@ -503,34 +490,40 @@ h2 {
 .profile-form :deep(.el-select__wrapper) {
   min-height: 40px;
   border-radius: 0;
-  box-shadow: 0 0 0 1px $industrial-border inset;
+  box-shadow: 0 0 0 1px var(--app-border) inset;
 }
 
 .profile-form :deep(.el-input__wrapper.is-focus),
 .profile-form :deep(.el-select__wrapper.is-focused) {
-  box-shadow: 0 0 0 1px $industrial-signal inset;
+  box-shadow: 0 0 0 1px var(--el-color-primary) inset;
 }
 
 .readonly-field :deep(.el-input__wrapper) {
-  background: $industrial-panel-raised;
+  background: var(--app-surface-raised);
 }
 
 .form-actions {
   margin-top: 4px;
   padding-top: 20px;
-  border-top: 1px solid $industrial-border;
+  border-top: 1px solid var(--app-border);
 }
 
 .save-hint {
-  color: $industrial-muted;
+  color: var(--app-muted);
   font-size: 12px;
 }
 
 .form-actions :deep(.el-button--primary) {
   min-width: 112px;
   border-radius: 0;
-  background: $industrial-signal;
-  border-color: $industrial-signal;
+  background: var(--el-color-primary);
+  border-color: var(--el-color-primary);
+}
+
+.form-actions :deep(.el-button--primary:hover),
+.form-actions :deep(.el-button--primary:focus-visible) {
+  background: var(--el-color-primary-dark-2);
+  border-color: var(--el-color-primary-dark-2);
 }
 
 .security-card {
@@ -540,12 +533,21 @@ h2 {
 
 .security-copy p:last-child {
   margin-top: 8px;
-  color: $industrial-muted;
+  color: var(--app-muted);
   font-size: 13px;
 }
 
 .security-card :deep(.el-button) {
   border-radius: 0;
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+
+.security-card :deep(.el-button:hover),
+.security-card :deep(.el-button:focus-visible) {
+  border-color: var(--el-color-primary);
+  color: var(--el-color-primary);
+  background: var(--el-color-primary-light-9);
 }
 
 .visually-hidden {
@@ -570,10 +572,6 @@ h2 {
 
   .page-heading {
     align-items: flex-start;
-  }
-
-  .heading-index {
-    display: none;
   }
 
   .identity-card,

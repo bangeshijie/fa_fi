@@ -2,8 +2,10 @@
     <section class="admin-page">
         <header class="page-heading">
             <div>
-                <p class="eyebrow">组织配置</p>
-                <h1>岗位管理</h1>
+                <div class="heading-title-row">
+                    <h2>岗位管理</h2>
+                    <p class="eyebrow">组织配置</p>
+                </div>
                 <p class="heading-copy">维护岗位名称、显示顺序和启用状态。</p>
             </div>
             <div class="heading-index">03 / POSITIONS</div>
@@ -756,13 +758,6 @@ onMounted(async () => {
     font-size: 11px;
     font-weight: 700;
     letter-spacing: .12em;
-}
-
-h1 {
-    margin: 8px 0 0;
-    font-size: clamp(28px, 4vw, 46px);
-    letter-spacing: -.045em;
-    line-height: 1;
 }
 
 .heading-copy {

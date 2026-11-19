@@ -2,8 +2,10 @@
   <section class="admin-page">
     <header class="page-heading">
       <div>
-        <p class="eyebrow">SYSTEM / DICTIONARY</p>
-        <h1>字典管理</h1>
+        <div class="heading-title-row">
+          <h2>字典管理</h2>
+          <p class="eyebrow">SYSTEM / DICTIONARY</p>
+        </div>
         <p class="heading-copy">维护业务字典类型和字典数据，统一管理下拉选项与状态标识。</p>
       </div>
       <div class="heading-actions">
@@ -382,7 +384,6 @@ onMounted(loadData)
 .page-heading, .card-heading, .heading-actions, .pagination-row, .panel-switch { display: flex; align-items: center; }
 .page-heading { justify-content: space-between; gap: 24px; padding: 6px 0 24px; border-bottom: 1px solid var(--app-border); }
 .eyebrow, .section-index { margin: 0; color: var(--el-color-primary); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
-h1 { margin: 8px 0 0; font-size: clamp(28px, 4vw, 46px); letter-spacing: -.045em; line-height: 1; }
 .heading-copy, .muted-text, .form-tip { color: var(--app-muted); }
 .heading-copy { margin: 12px 0 0; font-size: 13px; }
 .heading-actions { flex-wrap: wrap; justify-content: flex-end; gap: 8px; }

@@ -1,3 +1,4 @@
+import re
 from urllib.parse import urlparse
 
 from fastapi import Query
@@ -15,6 +16,20 @@ from app.api.v1.module_system.role.schema import RoleOutSchema
 from app.common.enums import QueueEnum
 from app.core.base_schema import BaseSchema, CommonSchema,  UserBySchema
 from app.core.validator import DateTimeStr, email_validator, mobile_validator
+
+
+USERNAME_MAX_LENGTH = 32
+USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{3,31}$")
+
+
+def validate_username_value(value: str) -> str:
+    """校验并规范化用户登录账号。"""
+    normalized = value.strip()
+    if not normalized:
+        raise ValueError("账号不能为空")
+    if not USERNAME_PATTERN.fullmatch(normalized):
+        raise ValueError("账号需以字母或数字开头，4-32位，仅含字母、数字、下划线、点和横线")
+    return normalized
 
 
 class CurrentUserUpdateSchema(BaseModel):
@@ -144,7 +159,7 @@ class UserRegisterSchema(BaseModel):
     @classmethod
     def validate_username(cls, value: str):
         """
-        校验并规范化账号：字母开头，长度 3-32，仅含字母/数字/_ . -。
+        校验并规范化账号：字母或数字开头，长度 4-32，仅含字母/数字/_ . -。
 
         参数:
         - value (str): 账号。
@@ -155,15 +170,7 @@ class UserRegisterSchema(BaseModel):
         异常:
         - ValueError: 账号为空或不满足格式约束时抛出。
         """
-        v = value.strip()
-        if not v:
-            raise ValueError("账号不能为空")
-        # 字母开头，允许字母数字_.-
-        import re
-
-        if not re.match(r"^[A-Za-z][A-Za-z0-9_.-]{2,31}$", v):
-            raise ValueError("账号需字母开头，3-32位，仅含字母/数字/_ . -")
-        return v
+        return validate_username_value(value)
 
     @model_validator(mode="after")
     def check_model(self):
@@ -231,7 +238,19 @@ class UserCreateSchema(CurrentUserUpdateSchema):
 
     model_config = ConfigDict(from_attributes=True)
 
-    username: str | None = Field(default=None, max_length=32, description="用户名")
+    username: str | None = Field(
+        default=None,
+        max_length=USERNAME_MAX_LENGTH,
+        description="用户名（字母或数字开头，至少4个字符）",
+    )
+
+    @field_validator("username")
+    @classmethod
+    def validate_username(cls, value: str | None):
+        """校验新增或更新用户时的登录账号。"""
+        if value is None:
+            return value
+        return validate_username_value(value)
     password: str | None = Field(default=None, max_length=128, description="密码哈希值")
     status: str = Field(default="0", description="是否可用")
     description: str | None = Field(default=None, max_length=255, description="备注")

@@ -2,8 +2,10 @@
     <section class="admin-page">
         <header class="page-heading">
             <div>
-                <p class="eyebrow">系统用户</p>
-                <h1>用户管理</h1>
+                <div class="heading-title-row">
+                    <h2>用户管理</h2>
+                    <p class="eyebrow">系统用户</p>
+                </div>
                 <p class="heading-copy">维护登录账号、组织关系和访问身份。</p>
             </div>
             <div class="heading-index">01 / USERS</div>
@@ -779,18 +781,18 @@ const formRules: FormRules = {
         },
 
         {
-            min: 3,
+            min: 4,
             max: 32,
             message:
-                "用户名长度为 3-32 个字符",
+                "用户名长度为 4-32 个字符",
             trigger: "blur",
         },
 
         {
             pattern:
-                /^[A-Za-z][A-Za-z0-9_.-]*$/,
+                /^[A-Za-z0-9][A-Za-z0-9_.-]*$/,
             message:
-                "用户名必须以字母开头，只能包含字母、数字、下划线、点和横线",
+                "用户名必须以字母或数字开头，只能包含字母、数字、下划线、点和横线",
             trigger: "blur",
         },
     ],
@@ -1767,13 +1769,6 @@ onMounted(async () => {
     font-size: 11px;
     font-weight: 700;
     letter-spacing: .12em;
-}
-
-h1 {
-    margin: 8px 0 0;
-    font-size: clamp(28px, 4vw, 46px);
-    letter-spacing: -.045em;
-    line-height: 1;
 }
 
 .heading-copy {

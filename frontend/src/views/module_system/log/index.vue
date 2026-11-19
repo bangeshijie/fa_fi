@@ -2,8 +2,10 @@
   <section class="log-page">
     <header class="page-heading">
       <div>
-        <p class="eyebrow">SYSTEM / LOG</p>
-        <h1>系统日志</h1>
+        <div class="heading-title-row">
+          <h2>系统日志</h2>
+          <p class="eyebrow">SYSTEM / LOG</p>
+        </div>
         <p class="heading-copy">查询登录与操作记录，定位请求来源、响应结果和处理耗时。</p>
       </div>
       <div class="heading-actions">
@@ -337,13 +339,6 @@ onMounted(loadData)
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .12em;
-}
-
-h1 {
-  margin: 8px 0 0;
-  font-size: clamp(28px, 4vw, 46px);
-  letter-spacing: -.045em;
-  line-height: 1;
 }
 
 .heading-copy,

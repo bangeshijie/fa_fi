@@ -103,6 +103,49 @@ body,
 
 body { margin: 0; }
 
+/* Compact, two-part page headings shared by the business pages. */
+body .page-heading.page-heading {
+  padding-bottom: 14px;
+}
+
+body .page-heading > div:first-child {
+  min-width: 0;
+  flex: 1;
+}
+
+body .page-heading .heading-title-row {
+  white-space: nowrap;
+}
+
+body .page-heading .heading-title-row h2,
+body .home-header__left > h2 {
+  display: inline-block;
+  vertical-align: baseline;
+  margin: 0;
+  color: var(--app-text);
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 700;
+  letter-spacing: -.035em;
+  line-height: 1.1;
+}
+
+body .page-heading .heading-title-row .eyebrow {
+  display: inline-block;
+  margin: 0 0 0 20px;
+  vertical-align: baseline;
+  text-align: right;
+}
+
+body .page-heading .heading-copy {
+  margin-top: 6px;
+}
+
+@media (max-width: 760px) {
+  body .page-heading .heading-title-row {
+    white-space: normal;
+  }
+}
+
 /* Element Plus remains the component system; these are project-wide tokens. */
 .el-card,
 .el-dialog,

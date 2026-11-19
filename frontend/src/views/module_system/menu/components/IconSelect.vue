@@ -1,5 +1,5 @@
 <template>
-    <el-popover v-model:visible="visible" placement="bottom-start" :width="420" trigger="click">
+    <el-popover v-model:visible="visible" placement="bottom-start" :width="560" trigger="click">
         <template #reference>
             <el-input :model-value="modelValue" readonly placeholder="请选择图标" clearable @clear="handleClear">
                 <template #prefix>

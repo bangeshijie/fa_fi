@@ -7,7 +7,7 @@
 
             <el-scrollbar class="scrollbar">
                 <el-menu :collapse="layoutSettingStore.fold" :default-active="$route.path" class="scrollbarmenu" router>
-                    <MainMenu :menuList="authStore.routeList" />
+                    <MainMenu :menuList="menuList" />
                 </el-menu>
             </el-scrollbar>
         </el-aside>
@@ -78,6 +78,8 @@
 
 <script setup lang="ts">
 
+import { computed } from 'vue'
+
 import Logo from './logo/index.vue'
 import MainMenu from './menu/index.vue'
 import Tabbar from './tabbar/index.vue'
@@ -85,12 +87,51 @@ import RouteView from './components/RouteView.vue'
 
 import { useAuthStore } from '@/store/auth.ts'
 import useLayoutSettingStore from '@/store/layoutsetting'
+import { constantMenuRoutes } from '@/router/routes'
+import type { AppRouteRecord } from '@/types/router'
 
 
 const authStore = useAuthStore()
 
 const layoutSettingStore =
     useLayoutSettingStore()
+
+/**
+ * 侧边栏由固定菜单和权限菜单共同组成。
+ *
+ * Home 和 About 已经是常量路由，不应该等待后端菜单权限返回；动态菜单
+ * 仍然来自 authStore.routeList。固定菜单按“首页、动态菜单、关于”的顺序
+ * 组合，且额外过滤固定菜单，防止后端仍保留同名菜单时出现重复菜单项。
+ */
+const menuList = computed<AppRouteRecord[]>(() => {
+    const homeRoutes = constantMenuRoutes.filter(
+        route => route.name === 'Home',
+    ) as AppRouteRecord[]
+
+    const aboutRoutes = constantMenuRoutes.filter(
+        route => route.name === 'About',
+    ) as AppRouteRecord[]
+
+    const dynamicRoutes = authStore.routeList.filter(route =>
+        !constantMenuRoutes.some(fixedRoute => {
+            const fixedPath = String(fixedRoute.path || '')
+                .replace(/^\/+/, '')
+            const dynamicPath = String(route.path || '')
+                .replace(/^\/+/, '')
+
+            return (
+                fixedRoute.name === route.name ||
+                fixedPath === dynamicPath
+            )
+        }),
+    )
+
+    return [
+        ...homeRoutes,
+        ...dynamicRoutes,
+        ...aboutRoutes,
+    ]
+})
 
 </script>
 
@@ -273,9 +314,14 @@ const layoutSettingStore =
 
         .main-content {
 
-            flex: 1;
+            /*
+             * 不再用 flex: 1 把 footer 推到可视区域底部。
+             * 保留首屏高度，让 footer 位于内容流末尾，需要滚动到底部才显示。
+             */
+            flex: 0 0 auto;
 
-            min-height: 0;
+            min-height:
+                calc(100vh - $base-tabbar-height - 40px);
         }
 
 
@@ -289,7 +335,7 @@ const layoutSettingStore =
                 15px 0;
 
             margin-top:
-                auto;
+                24px;
 
             border-top: 1px solid var(--app-border);
 

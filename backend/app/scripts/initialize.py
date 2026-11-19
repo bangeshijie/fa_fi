@@ -5,6 +5,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.module_system.dept.model import DeptModel
+from app.api.v1.module_dimension.company.model import CompanyModel
 from app.api.v1.module_system.dict.model import DictDataModel, DictTypeModel
 from app.api.v1.module_system.menu.model import MenuModel
 from app.api.v1.module_system.params.model import ParamsModel
@@ -30,6 +31,7 @@ class InitializeData:
             MenuModel,
             ParamsModel,
             DeptModel,
+            CompanyModel,
             RoleModel,
             DictTypeModel,
             DictDataModel,

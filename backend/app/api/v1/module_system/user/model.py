@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, declared_attr, mapped_column, relationship
 
-from app.core.base_model import MappedBase, ModelMixin,  UserMixin
+from app.core.base_model import MappedBase, ModelMixin, UserMixin
 
 if TYPE_CHECKING:
     from app.api.v1.module_system.dept.model import DeptModel
@@ -83,142 +83,97 @@ class UserModel(ModelMixin, UserMixin):
     ]
 
     username: Mapped[str] = mapped_column(
-        String(64),
-        nullable=False,
-        comment="用户名/登录账号"
+        String(64), nullable=False, comment="用户名/登录账号"
     )
 
     password: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False,
-        comment="密码哈希"
+        String(255), nullable=False, comment="密码哈希"
     )
 
-    name: Mapped[str] = mapped_column(
-        String(32),
-        nullable=False,
-        comment="昵称"
-    )
+    name: Mapped[str] = mapped_column(String(32), nullable=False, comment="昵称")
 
     mobile: Mapped[str | None] = mapped_column(
-        String(11),
-        nullable=True,
-        comment="手机号"
+        String(11), nullable=True, comment="手机号"
     )
 
-    email: Mapped[str | None] = mapped_column(
-        String(64),
-        nullable=True,
-        comment="邮箱"
-    )
+    email: Mapped[str | None] = mapped_column(String(64), nullable=True, comment="邮箱")
 
     gender: Mapped[str | None] = mapped_column(
-        String(1),
-        nullable=True,
-        comment="性别编码，取值由 sys_user_sex 字典配置"
+        String(1), nullable=True, comment="性别编码，取值由 sys_user_sex 字典配置"
     )
 
     avatar: Mapped[str | None] = mapped_column(
-        String(255),
-        nullable=True,
-        comment="头像URL"
+        String(255), nullable=True, comment="头像URL"
     )
 
     is_superuser: Mapped[bool] = mapped_column(
-        Boolean,
-        default=False,
-        nullable=False,
-        comment="是否超级管理员"
+        Boolean, default=False, nullable=False, comment="是否超级管理员"
     )
 
     last_login: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True),
-        nullable=True,
-        comment="最后登录时间"
+        DateTime(timezone=True), nullable=True, comment="最后登录时间"
     )
 
-
     gitee_login: Mapped[str | None] = mapped_column(
-        String(32),
-        nullable=True,
-        comment="Gitee登录"
+        String(32), nullable=True, comment="Gitee登录"
     )
 
     github_login: Mapped[str | None] = mapped_column(
-        String(32),
-        nullable=True,
-        comment="Github登录"
+        String(32), nullable=True, comment="Github登录"
     )
 
     wx_login: Mapped[str | None] = mapped_column(
-        String(32),
-        nullable=True,
-        comment="微信登录"
+        String(32), nullable=True, comment="微信登录"
     )
 
     qq_login: Mapped[str | None] = mapped_column(
-        String(32),
-        nullable=True,
-        comment="QQ登录"
+        String(32), nullable=True, comment="QQ登录"
     )
-
 
     # 所属部门
     dept_id: Mapped[int | None] = mapped_column(
         Integer,
-        ForeignKey(
-            "sys_dept.id",
-            ondelete="SET NULL",
-            onupdate="CASCADE"
-        ),
+        ForeignKey("sys_dept.id", ondelete="SET NULL", onupdate="CASCADE"),
         nullable=True,
         index=True,
         comment="部门ID",
     )
 
-
     # 部门关系
     dept: Mapped["DeptModel | None"] = relationship(
-        back_populates="users",
-        foreign_keys=[dept_id],
-        lazy="selectin"
+        back_populates="users", foreign_keys=[dept_id], lazy="selectin"
     )
-
 
     # 用户角色
     roles: Mapped[list["RoleModel"]] = relationship(
-        secondary="sys_user_roles",
-        back_populates="users",
-        lazy="selectin"
+        secondary="sys_user_roles", back_populates="users", lazy="selectin"
     )
-
 
     # 用户岗位
     positions: Mapped[list["PositionModel"]] = relationship(
-        secondary="sys_user_positions",
-        back_populates="users",
-        lazy="selectin"
+        secondary="sys_user_positions", back_populates="users", lazy="selectin"
     )
-
 
     # 创建人
-    created_by: Mapped["UserModel | None"] = relationship(
-        "UserModel",
-        foreign_keys="UserModel.created_id",
-        remote_side="UserModel.id",
-        lazy="selectin",
-        uselist=False,
-        viewonly=True,
-    )
-
+    @declared_attr
+    def created_by(cls) -> Mapped["UserModel | None"]:
+        return relationship(
+            "UserModel",
+            foreign_keys="UserModel.created_id",
+            remote_side="UserModel.id",
+            lazy="selectin",
+            uselist=False,
+            viewonly=True,
+        )
 
     # 修改人
-    updated_by: Mapped["UserModel | None"] = relationship(
-        "UserModel",
-        foreign_keys="UserModel.updated_id",
-        remote_side="UserModel.id",
-        lazy="selectin",
-        uselist=False,
-        viewonly=True,
-    )
-
+    @declared_attr
+    def updated_by(cls) -> Mapped["UserModel | None"]:
+        return relationship(
+            "UserModel",
+            foreign_keys="UserModel.updated_id",
+            remote_side="UserModel.id",
+            lazy="selectin",
+            uselist=False,
+            viewonly=True,
+        )

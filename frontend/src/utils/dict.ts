@@ -1,6 +1,8 @@
 import DictAPI, { type DictDataTable } from "@/api/module_system/dict";
 
 export const USER_SEX_DICT_TYPE = "sys_user_sex";
+export const COST_CENTER_FUNCTION_SCOPE_DICT_TYPE = "dim_cost_center_function_scope";
+export const BUDGET_VERSION_DICT_TYPE = "dim_budget_version";
 
 export type DictOption = DictDataTable & { dict_value: string };
 

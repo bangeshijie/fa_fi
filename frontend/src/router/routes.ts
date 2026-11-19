@@ -1,6 +1,38 @@
 import type { RouteRecordRaw } from 'vue-router'
 
 /**
+ * 不依赖后端权限的固定菜单路由。
+ *
+ * Home 是登录后的基础入口，即使当前用户没有配置任何业务菜单，
+ * 也必须可以访问；因此它既注册到 Layout，也提供给侧边栏使用。
+ */
+export const constantMenuRoutes: RouteRecordRaw[] = [
+    {
+        path: 'home',
+        name: 'Home',
+        component: () =>
+            import('@/views/home/index.vue'),
+        meta: {
+            title: '首页',
+            icon: 'HomeFilled',
+            hidden: false,
+            affix: true,
+        },
+    },
+    {
+        path: 'about',
+        name: 'About',
+        component: () =>
+            import('@/views/about/index.vue'),
+        meta: {
+            title: '关于',
+            icon: 'InfoFilled',
+            hidden: false,
+        },
+    },
+]
+
+/**
  * 静态路由
  *
  * Layout 是整个后台系统的页面框架。
@@ -36,6 +68,7 @@ export const constantRoutes: RouteRecordRaw[] = [
             import('@/layout/index.vue'),
 
         children: [
+            ...constantMenuRoutes,
             {
                 path: 'profile',
                 name: 'Profile',

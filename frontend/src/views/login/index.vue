@@ -130,9 +130,9 @@ const validateUsername = (_rule: any, value: string, callback: (error?: Error) =
     return
   }
   const trimmed = value.trim()
-  const accountRegex = /^[a-zA-Z][a-zA-Z0-9_]{4,19}$/
+  const accountRegex = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{3,31}$/
   if (!accountRegex.test(trimmed)) {
-    callback(new Error('用户名以字母开头，5-20位，字母数字下划线'))
+    callback(new Error('用户名需以字母或数字开头，4-32位，仅含字母、数字、下划线、点和横线'))
     return
   }
   callback()

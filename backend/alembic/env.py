@@ -3,6 +3,11 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from app.api.v1.module_dimension.accounting_subject.model import AccountingSubjectModel
+from app.api.v1.module_dimension.company.model import CompanyModel
+from app.api.v1.module_dimension.cost_center.model import CostCenterModel
+from app.api.v1.module_financial.accounting_voucher_detail.model import AccountingVoucherDetailModel
+from app.api.v1.module_budget.budget_detail.model import BudgetDetailModel
 from app.api.v1.module_system.dept.model import DeptModel
 from app.api.v1.module_system.dict.model import DictDataModel, DictTypeModel
 from app.api.v1.module_system.log.model import OperationLogModel
@@ -26,6 +31,11 @@ from app.core.base_model import MappedBase
 
 # 保留这些模型的导入，使所有表都注册到 MappedBase.metadata，支持 autogenerate。
 _MODEL_CLASSES = (
+    AccountingSubjectModel,
+    CompanyModel,
+    CostCenterModel,
+    AccountingVoucherDetailModel,
+    BudgetDetailModel,
     DeptModel,
     DictDataModel,
     DictTypeModel,

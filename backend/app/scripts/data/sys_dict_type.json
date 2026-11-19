@@ -58,5 +58,17 @@
     "dict_type": "sys_list_class",
     "status": "0",
     "description": "表格回显样式列表"
+  },
+  {
+    "dict_name": "成本中心职能范围",
+    "dict_type": "dim_cost_center_function_scope",
+    "status": "0",
+    "description": "成本中心职能范围代码与名称映射"
+  },
+  {
+    "dict_name": "预算版本",
+    "dict_type": "dim_budget_version",
+    "status": "0",
+    "description": "预算明细使用的预算版本"
   }
 ]

@@ -4,6 +4,10 @@ from typing import Protocol
 from app.config.setting import settings
 
 
+COST_CENTER_FUNCTION_SCOPE_DICT_TYPE = "dim_cost_center_function_scope"
+BUDGET_VERSION_DICT_TYPE = "dim_budget_version"
+
+
 class RET(Enum):
     """
     系统返回码枚举

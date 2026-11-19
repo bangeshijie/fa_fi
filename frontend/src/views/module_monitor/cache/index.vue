@@ -2,8 +2,10 @@
   <section class="monitor-page cache-page">
     <header class="page-heading">
       <div>
-        <p class="eyebrow">MONITOR / CACHE</p>
-        <h1>缓存监控</h1>
+        <div class="heading-title-row">
+          <h2>缓存监控</h2>
+          <p class="eyebrow">MONITOR / CACHE</p>
+        </div>
         <p class="heading-copy">查看 Redis 运行状态、系统缓存命名空间和当前键值。</p>
       </div>
       <div class="heading-actions">
@@ -346,7 +348,6 @@ onMounted(loadData)
 .page-heading, .card-heading, .heading-actions, .key-toolbar, .namespace-name, .value-meta { display: flex; align-items: center; }
 .page-heading { justify-content: space-between; gap: 24px; padding: 6px 0 24px; border-bottom: 1px solid var(--app-border); }
 .eyebrow, .section-index { margin: 0; color: var(--el-color-primary); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
-h1 { margin: 8px 0 0; font-size: clamp(28px, 4vw, 46px); letter-spacing: -.045em; line-height: 1; }
 .heading-copy, .card-note, .summary-label, .summary-card small { color: var(--app-muted); }
 .heading-copy { margin: 12px 0 0; font-size: 13px; }
 .heading-actions { flex-wrap: wrap; justify-content: flex-end; gap: 8px; }

@@ -2,8 +2,10 @@
   <section class="monitor-page server-page">
     <header class="page-heading">
       <div>
-        <p class="eyebrow">MONITOR / SERVER</p>
-        <h1>服务器监控</h1>
+        <div class="heading-title-row">
+          <h2>服务器监控</h2>
+          <p class="eyebrow">MONITOR / SERVER</p>
+        </div>
         <p class="heading-copy">查看当前运行主机、Python 进程和磁盘资源的实时概况。</p>
       </div>
       <div class="heading-actions">
@@ -199,7 +201,6 @@ onMounted(async () => {
 .page-heading, .card-heading, .heading-actions, .metric-card-heading, .metric-body, .disk-progress { display: flex; align-items: center; }
 .page-heading { justify-content: space-between; gap: 24px; padding: 6px 0 24px; border-bottom: 1px solid var(--app-border); }
 .eyebrow, .section-index { margin: 0; color: var(--el-color-primary); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
-h1 { margin: 8px 0 0; font-size: clamp(28px, 4vw, 46px); letter-spacing: -.045em; line-height: 1; }
 .heading-copy, .card-note, .summary-label, .metric-body small, .metric-body p { color: var(--app-muted); }
 .heading-copy { margin: 12px 0 0; font-size: 13px; }
 .heading-actions { flex-wrap: wrap; justify-content: flex-end; gap: 12px; }

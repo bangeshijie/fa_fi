@@ -2,8 +2,10 @@
   <section class="admin-page">
     <header class="page-heading">
       <div>
-        <p class="eyebrow">SYSTEM / PARAMETER</p>
-        <h1>参数管理</h1>
+        <div class="heading-title-row">
+          <h2>参数管理</h2>
+          <p class="eyebrow">SYSTEM / PARAMETER</p>
+        </div>
         <p class="heading-copy">维护系统运行参数。参数键名创建后不可修改，参数值会同步到缓存。</p>
       </div>
       <div class="heading-actions">
@@ -336,7 +338,6 @@ onMounted(loadData)
 .page-heading, .card-heading, .heading-actions, .pagination-row { display: flex; align-items: center; }
 .page-heading { justify-content: space-between; gap: 24px; padding: 6px 0 24px; border-bottom: 1px solid var(--app-border); }
 .eyebrow, .section-index { margin: 0; color: var(--el-color-primary); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
-h1 { margin: 8px 0 0; font-size: clamp(28px, 4vw, 46px); letter-spacing: -.045em; line-height: 1; }
 .heading-copy, .card-heading small, .form-tip { color: var(--app-muted); }
 .heading-copy { margin: 12px 0 0; font-size: 13px; }
 .heading-actions { flex-wrap: wrap; justify-content: flex-end; gap: 8px; }

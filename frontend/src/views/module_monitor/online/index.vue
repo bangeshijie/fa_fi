@@ -2,8 +2,10 @@
   <section class="online-page">
     <header class="page-heading">
       <div>
-        <p class="eyebrow">MONITOR / ONLINE</p>
-        <h1>在线用户</h1>
+        <div class="heading-title-row">
+          <h2>在线用户</h2>
+          <p class="eyebrow">MONITOR / ONLINE</p>
+        </div>
         <p class="heading-copy">查看当前 Redis 会话，支持按账号、IP 和登录位置筛选。</p>
       </div>
       <div class="heading-actions">
@@ -235,13 +237,6 @@ onMounted(() => {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .12em;
-}
-
-h1 {
-  margin: 8px 0 0;
-  font-size: clamp(28px, 4vw, 46px);
-  letter-spacing: -.045em;
-  line-height: 1;
 }
 
 .heading-copy,

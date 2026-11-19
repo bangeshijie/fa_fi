@@ -26,7 +26,7 @@
     <!-- 账户入口 -->
     <el-dropdown class="account-dropdown" trigger="click">
         <button class="account-trigger" type="button">
-            <el-avatar :src="resolveAssetUrl(authStore.info.avatar) || undefined" :size="30">
+            <el-avatar :src="resolveAssetUrl(authStore.info.avatar) || undefined" :size="26">
                 {{ (authStore.info.name || authStore.info.username || '用').slice(0, 1) }}
             </el-avatar>
             <span class="account-name">
@@ -293,13 +293,14 @@ const changeDark = () => {
 // ================= 账户下拉菜单样式 =================
 .account-dropdown {
     margin-right: 14px;
+    margin-top: 0px;
 }
 
 .account-trigger {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 5px 7px;
+    padding: 4px 8px;
     color: var(--el-text-color-primary);
     border: 1px solid transparent;
     border-radius: 2px;

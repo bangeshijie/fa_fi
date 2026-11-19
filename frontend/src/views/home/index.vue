@@ -4,7 +4,7 @@
   <header class="home-header">
     <div class="home-header__left">
 
-      <h1>{{ greetings() }}，{{ displayName }}</h1>
+      <h2>{{ greetings() }} {{ displayName }}</h2>
       <p>
         <el-icon>
           <Check />
@@ -202,14 +202,6 @@ function goProfile() { router.push('/profile') }
     opacity: 0.3;
     transform: scale(0.7);
   }
-}
-
-.home-header h1 {
-  margin: 12px 0 8px;
-  font-size: clamp(26px, 4vw, 42px);
-  font-weight: 500;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
 }
 
 .home-header p {

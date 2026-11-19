@@ -406,5 +406,77 @@
     "is_default": false,
     "status": "0",
     "description": "危险表格回显样式"
+  },
+  {
+    "dict_sort": 1,
+    "dict_label": "销售",
+    "dict_value": "4000",
+    "dict_type": "dim_cost_center_function_scope",
+    "dict_type_id": 11,
+    "css_class": "",
+    "list_class": "primary",
+    "is_default": false,
+    "status": "0",
+    "description": "成本中心职能范围：销售"
+  },
+  {
+    "dict_sort": 2,
+    "dict_label": "管理",
+    "dict_value": "5000",
+    "dict_type": "dim_cost_center_function_scope",
+    "dict_type_id": 11,
+    "css_class": "",
+    "list_class": "warning",
+    "is_default": false,
+    "status": "0",
+    "description": "成本中心职能范围：管理"
+  },
+  {
+    "dict_sort": 3,
+    "dict_label": "研发",
+    "dict_value": "5500",
+    "dict_type": "dim_cost_center_function_scope",
+    "dict_type_id": 11,
+    "css_class": "",
+    "list_class": "success",
+    "is_default": false,
+    "status": "0",
+    "description": "成本中心职能范围：研发"
+  },
+  {
+    "dict_sort": 1,
+    "dict_label": "年初预算",
+    "dict_value": "YBB",
+    "dict_type": "dim_budget_version",
+    "dict_type_id": 12,
+    "css_class": "",
+    "list_class": "primary",
+    "is_default": true,
+    "status": "0",
+    "description": "预算版本：YBB 年初预算"
+  },
+  {
+    "dict_sort": 2,
+    "dict_label": "管控预算",
+    "dict_value": "MCB",
+    "dict_type": "dim_budget_version",
+    "dict_type_id": 12,
+    "css_class": "",
+    "list_class": "warning",
+    "is_default": false,
+    "status": "0",
+    "description": "预算版本：MCB 管控预算"
+  },
+  {
+    "dict_sort": 3,
+    "dict_label": "A+B预测",
+    "dict_value": "ABF",
+    "dict_type": "dim_budget_version",
+    "dict_type_id": 12,
+    "css_class": "",
+    "list_class": "success",
+    "is_default": false,
+    "status": "0",
+    "description": "预算版本：ABF A+B预测"
   }
 ]

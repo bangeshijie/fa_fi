@@ -38,10 +38,11 @@ defineOptions({
 
 .tabbar {
     width: 100%;
-    height: 50%;
+    height: 70%;
     display: flex;
     justify-content: space-between;
     flex-shrink: 0;
+
 }
 
 .tabbar_left {
