@@ -6,6 +6,7 @@ from sqlalchemy import engine_from_config, pool
 from app.api.v1.module_dimension.accounting_subject.model import AccountingSubjectModel
 from app.api.v1.module_dimension.company.model import CompanyModel
 from app.api.v1.module_dimension.cost_center.model import CostCenterModel
+from app.api.v1.module_dimension.subject_control_department_mapping.model import SubjectControlDepartmentMappingModel
 from app.api.v1.module_financial.accounting_voucher_detail.model import AccountingVoucherDetailModel
 from app.api.v1.module_budget.budget_detail.model import BudgetDetailModel
 from app.api.v1.module_system.dept.model import DeptModel
@@ -34,6 +35,7 @@ _MODEL_CLASSES = (
     AccountingSubjectModel,
     CompanyModel,
     CostCenterModel,
+    SubjectControlDepartmentMappingModel,
     AccountingVoucherDetailModel,
     BudgetDetailModel,
     DeptModel,

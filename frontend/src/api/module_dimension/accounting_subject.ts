@@ -102,7 +102,6 @@ export interface AccountingSubjectPageQuery extends PageQuery {
   balance_direction?: string
   accounting_statement_subject?: string
   management_category_paths?: string[]
-  leader?: string
   status?: string
 }
 
@@ -120,7 +119,6 @@ export interface AccountingSubjectTable extends BaseType {
   management_category_level3?: string | null
   management_category_level1?: string | null
   management_category_level2?: string | null
-  leader?: string | null
   status?: string
   description?: string
   created_time?: string
@@ -147,7 +145,6 @@ export interface AccountingSubjectForm {
   management_category_level3?: string | null
   management_category_level1?: string | null
   management_category_level2?: string | null
-  leader?: string | null
   status?: string
   description?: string | null
 }

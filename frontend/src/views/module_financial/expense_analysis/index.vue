@@ -6,7 +6,7 @@
           <h2>费用分析</h2>
           <p class="eyebrow">FINANCIAL / EXPENSE ANALYSIS</p>
         </div>
-        <p class="heading-copy">按部门和会计科目聚合预算、实际及差额，实际数据包含调整数据。</p>
+        <p class="heading-copy">按部门、会计科目和主控部门聚合预算、实际及差额，实际数据包含调整数据。</p>
       </div>
       <div class="heading-actions">
 
@@ -72,12 +72,6 @@
             <el-option v-for="option in functionScopeOptions" :key="option.dict_value" :value="option.dict_value"
               :label="`${option.dict_value} ${option.dict_label || ''}`" />
           </el-select>
-        </el-form-item>
-
-        <el-form-item label="管理分类">
-          <el-cascader v-model="query.management_category_paths" :options="categoryOptions"
-            :props="categoryCascaderProps" clearable filterable collapse-tags collapse-tags-tooltip
-            class="category-control" placeholder="全部管理分类" />
         </el-form-item>
 
         <el-form-item label="实际数据来源">
@@ -259,16 +253,15 @@
             <template #label><span class="tab-label">按科目 <em>{{ subjectRows.length }} 个根节点</em></span></template>
             <section class="table-section">
               <div class="table-heading">
-                <div><span class="section-index">A</span><strong>预实分析</strong></div><span>管理一级 → 二级 → 三级 → 会计科目</span>
+                <div><span class="section-index">A</span><strong>预实分析</strong></div><span>会计科目</span>
               </div>
-              <el-table :data="subjectRows" row-key="id" border stripe default-expand-all
-                :tree-props="{ children: 'children' }" :indent="18" show-summary :summary-method="varianceSummary"
-                class="analysis-table">
+              <el-table :data="subjectRows" row-key="id" border stripe show-summary
+                :summary-method="varianceSummary" class="analysis-table">
                 <el-table-column label="序号" width="160" fixed="left" align="center">
                   <template #default="{ row }"><span class="sequence-value">{{ getSequence('subject', row.id)
                   }}</span></template>
                 </el-table-column>
-                <el-table-column label="管理分类 / 会计科目" min-width="140" fixed="left"><template #default="{ row }">
+                <el-table-column label="会计科目" min-width="140" fixed="left"><template #default="{ row }">
                     <DimensionCell :row="row" />
                   </template></el-table-column>
                 <el-table-column label="当月" align="center" header-align="center">
@@ -320,14 +313,13 @@
               <div class="table-heading">
                 <div><span class="section-index">C</span><strong>实际趋势</strong></div><span>1 月至 12 月实际金额</span>
               </div>
-              <el-table :data="subjectRows" row-key="id" border stripe default-expand-all
-                :tree-props="{ children: 'children' }" :indent="18" show-summary :summary-method="actualSummary"
-                class="analysis-table monthly-table">
+              <el-table :data="subjectRows" row-key="id" border stripe show-summary
+                :summary-method="actualSummary" class="analysis-table monthly-table">
                 <el-table-column label="序号" width="160" fixed="left" align="center">
                   <template #default="{ row }"><span class="sequence-value">{{ getSequence('subject', row.id)
                   }}</span></template>
                 </el-table-column>
-                <el-table-column label="管理分类 / 会计科目" min-width="140" fixed="left"><template #default="{ row }">
+                <el-table-column label="会计科目" min-width="140" fixed="left"><template #default="{ row }">
                     <DimensionCell :row="row" />
                   </template></el-table-column>
                 <el-table-column v-for="month in monthOptions" :key="month" :prop="`actual_month_${month - 1}`"
@@ -342,19 +334,112 @@
                   月至 12
                   月</span>
               </div>
-              <el-table :data="subjectRows" row-key="id" border stripe default-expand-all
-                :tree-props="{ children: 'children' }" :indent="18" show-summary :summary-method="budgetSummary"
-                class="analysis-table monthly-table">
+              <el-table :data="subjectRows" row-key="id" border stripe show-summary
+                :summary-method="budgetSummary" class="analysis-table monthly-table">
                 <el-table-column label="序号" width="160" fixed="left" align="center">
                   <template #default="{ row }"><span class="sequence-value">{{ getSequence('subject', row.id)
                   }}</span></template>
                 </el-table-column>
-                <el-table-column label="管理分类 / 会计科目" min-width="140" fixed="left"><template #default="{ row }">
+                <el-table-column label="会计科目" min-width="140" fixed="left"><template #default="{ row }">
                     <DimensionCell :row="row" />
                   </template></el-table-column>
                 <el-table-column v-for="month in monthOptions" :key="month" :prop="`budget_month_${month - 1}`"
                   :label="`${month}月`" width="112" align="right"><template #default="{ row }">{{
                     formatAmount(row.budget_months[month - 1]) }}</template></el-table-column>
+              </el-table>
+            </section>
+          </el-tab-pane>
+          <el-tab-pane name="control_department">
+            <template #label><span class="tab-label">按主控部门 <em>{{ controlDepartmentRows.length }} 个主控部门</em></span></template>
+            <section class="table-section">
+              <div class="table-heading">
+                <div><span class="section-index">A</span><strong>预实分析</strong></div><span>主控部门 / 主控人</span>
+              </div>
+              <el-table :data="controlDepartmentRows" row-key="id" border stripe default-expand-all
+                :tree-props="{ children: 'children' }" :indent="18" show-summary
+                :summary-method="varianceSummary" class="analysis-table control-department-table">
+                <el-table-column label="序号" width="80" fixed="left" align="center">
+                  <template #default="{ row }"><span class="sequence-value">{{ getSequence('control_department', row.id) }}</span></template>
+                </el-table-column>
+                <el-table-column label="主控部门" min-width="190" fixed="left">
+                  <template #default="{ row }">
+                    <DimensionCell v-if="row.node_type === 'accounting_subject'" :row="row" />
+                    <strong v-else>{{ row.label }}</strong>
+                  </template>
+                </el-table-column>
+                <el-table-column label="主控人" min-width="120" fixed="left">
+                  <template #default="{ row }">{{ row.control_person || '未配置' }}</template>
+                </el-table-column>
+                <el-table-column label="当月" align="center" header-align="center">
+                  <el-table-column prop="current_actual" label="实际" width="124" align="right"><template #default="{ row }">{{ formatAmount(row.current_actual) }}</template></el-table-column>
+                  <el-table-column prop="current_budget" label="预算" width="124" align="right"><template #default="{ row }">{{ formatAmount(row.current_budget) }}</template></el-table-column>
+                  <el-table-column prop="current_variance" label="差额" width="124" align="right"><template #default="{ row }"><span :class="varianceClass(row.current_variance)">{{ formatAmount(row.current_variance) }}</span></template></el-table-column>
+                  <el-table-column prop="current_completion_rate" label="完成率" width="104" align="right"><template #default="{ row }">{{ formatRate(row.current_completion_rate) }}</template></el-table-column>
+                  <el-table-column prop="prior_year_current_completion_rate" label="同期" width="104" align="right"><template #default="{ row }">{{ formatRate(row.prior_year_current_completion_rate) }}</template></el-table-column>
+                </el-table-column>
+                <el-table-column label="累计" align="center" header-align="center">
+                  <el-table-column prop="ytd_actual" label="实际累计" width="124" align="right"><template #default="{ row }">{{ formatAmount(row.ytd_actual) }}</template></el-table-column>
+                  <el-table-column prop="ytd_budget" label="预算累计" width="124" align="right"><template #default="{ row }">{{ formatAmount(row.ytd_budget) }}</template></el-table-column>
+                  <el-table-column prop="ytd_variance" label="差额累计" width="124" align="right"><template #default="{ row }"><span :class="varianceClass(row.ytd_variance)">{{ formatAmount(row.ytd_variance) }}</span></template></el-table-column>
+                  <el-table-column prop="ytd_completion_rate" label="完成率累计" width="112" align="right"><template #default="{ row }">{{ formatRate(row.ytd_completion_rate) }}</template></el-table-column>
+                  <el-table-column prop="prior_year_ytd_completion_rate" label="同期累计" width="112" align="right"><template #default="{ row }">{{ formatRate(row.prior_year_ytd_completion_rate) }}</template></el-table-column>
+                </el-table-column>
+                <el-table-column label="年度" align="center" header-align="center">
+                  <el-table-column prop="annual_budget" label="全年预算" width="124" align="right"><template #default="{ row }">{{ formatAmount(row.annual_budget) }}</template></el-table-column>
+                  <el-table-column prop="annual_completion_rate" label="全年完成率" width="116" align="right"><template #default="{ row }">{{ formatRate(row.annual_completion_rate) }}</template></el-table-column>
+                </el-table-column>
+              </el-table>
+            </section>
+            <section class="trend-chart-section">
+              <div class="table-heading">
+                <div><span class="section-index">B</span><strong>预算 / 实际趋势</strong></div><span>主控部门合计 · 1 月至 12 月</span>
+              </div>
+              <IndustrialChart :option="trendOption" height="250px" :loading="loading" :is-empty="!hasTrendData" />
+            </section>
+            <section class="table-section">
+              <div class="table-heading">
+                <div><span class="section-index">C</span><strong>实际趋势</strong></div><span>1 月至 12 月实际金额</span>
+              </div>
+              <el-table :data="controlDepartmentRows" row-key="id" border stripe default-expand-all
+                :tree-props="{ children: 'children' }" :indent="18" show-summary
+                :summary-method="actualSummary" class="analysis-table monthly-table control-department-table">
+                <el-table-column label="序号" width="80" fixed="left" align="center">
+                  <template #default="{ row }"><span class="sequence-value">{{ getSequence('control_department', row.id) }}</span></template>
+                </el-table-column>
+                <el-table-column label="主控部门" min-width="190" fixed="left">
+                  <template #default="{ row }">
+                    <DimensionCell v-if="row.node_type === 'accounting_subject'" :row="row" />
+                    <strong v-else>{{ row.label }}</strong>
+                  </template>
+                </el-table-column>
+                <el-table-column label="主控人" min-width="120" fixed="left">
+                  <template #default="{ row }">{{ row.control_person || '未配置' }}</template>
+                </el-table-column>
+                <el-table-column v-for="month in monthOptions" :key="month" :prop="'actual_month_' + (month - 1)"
+                  :label="month + '月'" width="112" align="right"><template #default="{ row }">{{ formatAmount(row.actual_months[month - 1]) }}</template></el-table-column>
+              </el-table>
+            </section>
+            <section class="table-section">
+              <div class="table-heading">
+                <div><span class="section-index">D</span><strong>预算趋势</strong></div><span>{{ budgetVersionLabel }} · 1 月至 12 月</span>
+              </div>
+              <el-table :data="controlDepartmentRows" row-key="id" border stripe default-expand-all
+                :tree-props="{ children: 'children' }" :indent="18" show-summary
+                :summary-method="budgetSummary" class="analysis-table monthly-table control-department-table">
+                <el-table-column label="序号" width="80" fixed="left" align="center">
+                  <template #default="{ row }"><span class="sequence-value">{{ getSequence('control_department', row.id) }}</span></template>
+                </el-table-column>
+                <el-table-column label="主控部门" min-width="190" fixed="left">
+                  <template #default="{ row }">
+                    <DimensionCell v-if="row.node_type === 'accounting_subject'" :row="row" />
+                    <strong v-else>{{ row.label }}</strong>
+                  </template>
+                </el-table-column>
+                <el-table-column label="主控人" min-width="120" fixed="left">
+                  <template #default="{ row }">{{ row.control_person || '未配置' }}</template>
+                </el-table-column>
+                <el-table-column v-for="month in monthOptions" :key="month" :prop="'budget_month_' + (month - 1)"
+                  :label="month + '月'" width="112" align="right"><template #default="{ row }">{{ formatAmount(row.budget_months[month - 1]) }}</template></el-table-column>
               </el-table>
             </section>
           </el-tab-pane>
@@ -372,7 +457,6 @@ import { ElMessage } from 'element-plus'
 import { Refresh, Search } from '@element-plus/icons-vue'
 import type { EChartsOption } from 'echarts'
 
-import AccountingSubjectAPI, { type AccountingSubjectCategoryOption } from '@/api/module_dimension/accounting_subject'
 import CompanyAPI, { type CompanyOption } from '@/api/module_dimension/company'
 import type { DeptTable } from '@/api/module_system/dept'
 import ExpenseAnalysisAPI, { type ExpenseAnalysisQuery, type ExpenseAnalysisResult, type ExpenseAnalysisRow } from '@/api/module_financial/expense_analysis'
@@ -390,12 +474,11 @@ const dataSourceOptions = ['SAP原始明细', '单体财报调整', '合并财�
 const defaultPeriod = getPreviousMonthPeriod()
 
 const loading = ref(false)
-const activeView = ref<'department' | 'subject'>('department')
+const activeView = ref<'department' | 'subject' | 'control_department'>('department')
 const amountUnit = ref<'wan' | 'yuan'>('wan')
 const analysisResult = ref<ExpenseAnalysisResult>()
 const companyOptions = ref<CompanyOption[]>([])
 const departmentOptions = ref<DeptTable[]>([])
-const categoryOptions = ref<AccountingSubjectCategoryOption[]>([])
 const budgetVersionOptions = ref<DictOption[]>([])
 const functionScopeOptions = ref<DictOption[]>([])
 const defaultBudgetVersion = ref('')
@@ -407,7 +490,6 @@ const query = reactive<ExpenseAnalysisQuery>({
   company_ids: [],
   department_ids: [],
   function_scopes: [],
-  management_category_paths: [],
   data_source_categories: [...dataSourceOptions],
 })
 
@@ -419,12 +501,6 @@ const departmentCascaderProps = {
   checkStrictly: true,
   emitPath: false,
 }
-const categoryCascaderProps = {
-  multiple: true,
-  checkStrictly: true,
-  emitPath: true,
-}
-
 const DimensionCell = defineComponent({
   props: { row: { type: Object as () => ExpenseAnalysisRow, required: true } },
   setup(props) {
@@ -437,9 +513,14 @@ const DimensionCell = defineComponent({
   },
 })
 
-const currentDimension = computed(() => activeView.value === 'department' ? analysisResult.value!.department : analysisResult.value!.subject)
+const currentDimension = computed(() => {
+  if (activeView.value === 'department') return analysisResult.value!.department
+  if (activeView.value === 'subject') return analysisResult.value!.subject
+  return analysisResult.value!.control_department
+})
 const departmentRows = computed(() => analysisResult.value?.department.rows || [])
 const subjectRows = computed(() => analysisResult.value?.subject.rows || [])
+const controlDepartmentRows = computed(() => analysisResult.value?.control_department.rows || [])
 function buildSequenceMap(rows: ExpenseAnalysisRow[]) {
   const map = new Map<string, string>()
 
@@ -457,9 +538,14 @@ function buildSequenceMap(rows: ExpenseAnalysisRow[]) {
 
 const departmentSequenceMap = computed(() => buildSequenceMap(departmentRows.value))
 const subjectSequenceMap = computed(() => buildSequenceMap(subjectRows.value))
+const controlDepartmentSequenceMap = computed(() => buildSequenceMap(controlDepartmentRows.value))
 
-function getSequence(dimension: 'department' | 'subject', id: string) {
-  const map = dimension === 'department' ? departmentSequenceMap.value : subjectSequenceMap.value
+function getSequence(dimension: 'department' | 'subject' | 'control_department', id: string) {
+  const map = dimension === 'department'
+    ? departmentSequenceMap.value
+    : dimension === 'subject'
+      ? subjectSequenceMap.value
+      : controlDepartmentSequenceMap.value
   return map.get(id) || ''
 }
 
@@ -590,18 +676,16 @@ function budgetSummary({ columns }: { columns: Array<{ property?: string }> }) {
 }
 
 async function loadOptions() {
-  const [budgetResponse, functionScopeResponse, companyResponse, departmentResponse, categoryResponse] = await Promise.all([
+  const [budgetResponse, functionScopeResponse, companyResponse, departmentResponse] = await Promise.all([
     fetchDictOptions(BUDGET_VERSION_DICT_TYPE),
     fetchDictOptions(COST_CENTER_FUNCTION_SCOPE_DICT_TYPE),
     CompanyAPI.listCompanyOptions(),
     ExpenseAnalysisAPI.departments(),
-    AccountingSubjectAPI.categoryOptions(),
   ])
   budgetVersionOptions.value = budgetResponse
   functionScopeOptions.value = functionScopeResponse
   companyOptions.value = companyResponse.data.data || []
   departmentOptions.value = departmentResponse.data.data || []
-  categoryOptions.value = categoryResponse.data.data || []
   defaultBudgetVersion.value = getDefaultDictValue(budgetResponse) || 'MCB'
   if (!query.budget_version) query.budget_version = defaultBudgetVersion.value
 }
@@ -618,7 +702,6 @@ async function loadAnalysis() {
       company_ids: query.company_ids?.length ? query.company_ids : [],
       department_ids: query.department_ids?.length ? query.department_ids : [],
       function_scopes: query.function_scopes?.length ? query.function_scopes : [],
-      management_category_paths: query.management_category_paths?.length ? query.management_category_paths : [],
       data_source_categories: query.data_source_categories?.length ? query.data_source_categories : [],
     })
     analysisResult.value = response.data.data
@@ -639,7 +722,6 @@ function handleReset() {
   query.company_ids = []
   query.department_ids = []
   query.function_scopes = []
-  query.management_category_paths = []
   query.data_source_categories = [...dataSourceOptions]
   return loadAnalysis()
 }
@@ -725,7 +807,7 @@ onMounted(async () => {
 
 .filter-grid {
   display: grid;
-  grid-template-columns: 1.1fr .65fr .55fr 1fr 1.25fr 1.25fr 1.2fr .80fr auto auto;
+  grid-template-columns: 1.1fr .65fr .55fr 1fr 1.25fr 1.25fr 1.2fr auto;
   gap: 0 12px;
   align-items: end;
 }
@@ -740,7 +822,6 @@ onMounted(async () => {
 }
 
 .wide-control,
-.category-control,
 .source-control {
   width: 100%;
 }

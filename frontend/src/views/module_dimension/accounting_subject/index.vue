@@ -6,7 +6,7 @@
           <h2>会计科目管理</h2>
           <p class="eyebrow">DIMENSION / ACCOUNTING SUBJECT</p>
         </div>
-        <p class="heading-copy">维护会计科目代码、报表归属、管理分类和科目负责人。</p>
+        <p class="heading-copy">维护会计科目代码、报表归属和管理分类。</p>
       </div>
       <div class="heading-actions">
         <el-tag type="info" effect="plain">主数据</el-tag>
@@ -104,9 +104,6 @@
             clearable filterable collapse-tags collapse-tags-tooltip placeholder="全部管理分类" class="category-field"
             @change="handleCategoryChange" />
         </el-form-item>
-        <el-form-item label="负责人">
-          <el-input v-model="query.leader" clearable placeholder="科目负责人" />
-        </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="query.status" clearable placeholder="全部状态" class="select-field">
             <el-option value="0" label="正常" />
@@ -141,7 +138,6 @@
         <el-table-column prop="management_category_level1" label="管理一级分类" min-width="150" show-overflow-tooltip />
         <el-table-column prop="management_category_level2" label="管理二级分类" min-width="150" show-overflow-tooltip />
         <el-table-column prop="management_category_level3" label="管理三级分类" min-width="180" show-overflow-tooltip />
-        <el-table-column prop="leader" label="科目负责人" width="128" show-overflow-tooltip />
         <el-table-column label="状态" width="104" align="center">
           <template #default="{ row }">
             <el-switch v-if="hasPermission('module_dimension:accounting_subject:patch')"
@@ -220,11 +216,6 @@
           <el-col :xs="24" :sm="12">
             <el-form-item label="管理三级分类" prop="management_category_level3">
               <el-input v-model="form.management_category_level3" :disabled="isDetail" maxlength="128" />
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12">
-            <el-form-item label="科目负责人" prop="leader">
-              <el-input v-model="form.leader" :disabled="isDetail" maxlength="64" />
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12">
@@ -432,7 +423,6 @@ function handleReset() {
   query.accounting_statement_subject = undefined
   selectedCategoryPaths.value = []
   query.management_category_paths = undefined
-  query.leader = undefined
   query.status = undefined
   query.page_no = 1
   return loadData()
@@ -451,7 +441,6 @@ function resetForm() {
     management_category_level3: undefined,
     management_category_level1: undefined,
     management_category_level2: undefined,
-    leader: undefined,
     status: '0',
     description: undefined,
   })

@@ -1,11 +1,11 @@
-# FA-FI-MS 项目协作说明
+# FA-FI 项目协作说明
 
 > 本文件是本仓库的项目地图和协作约定，供后续开发者或代码代理使用。
 > 其中的路径、命令和行为以当前工作区代码为准；代码发生结构性变化后应同步更新本文件。
 
 ## 1. 项目概况
 
-FA-FI-MS 是一个前后端分离的财务运营/后台管理系统，当前包含：
+FA-FI 是一个前后端分离的财务运营/后台管理系统，当前包含：
 
 - 后端：Python、FastAPI、SQLAlchemy 2、Pydantic 2、Alembic。
 - 前端：Vue 3、TypeScript、Vite、Vue Router、Pinia、Element Plus。

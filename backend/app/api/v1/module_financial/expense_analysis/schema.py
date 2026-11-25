@@ -27,9 +27,6 @@ class ExpenseAnalysisQuerySchema(BaseModel):
     company_ids: list[int] = Field(default_factory=list, description="公司ID，可多选")
     department_ids: list[int] = Field(default_factory=list, description="部门ID，可多选")
     function_scopes: list[str] = Field(default_factory=list, description="职能范围，可多选")
-    management_category_paths: list[list[str]] = Field(
-        default_factory=list, description="管理分类路径，可多选"
-    )
     data_source_categories: list[VoucherDataSourceCategory] = Field(
         default_factory=list, description="实际数据来源分类，可多选；为空表示全部"
     )
@@ -49,20 +46,6 @@ class ExpenseAnalysisQuerySchema(BaseModel):
             return []
         return sorted({int(item) for item in value if int(item) > 0})
 
-    @field_validator("management_category_paths", mode="before")
-    @classmethod
-    def normalize_category_paths(cls, value: list[list[str]] | None) -> list[list[str]]:
-        if not value:
-            return []
-        paths: list[list[str]] = []
-        for path in value:
-            if not isinstance(path, list):
-                continue
-            normalized = [str(item).strip() for item in path if str(item).strip()]
-            if 1 <= len(normalized) <= 3:
-                paths.append(normalized)
-        return paths
-
     @field_validator("function_scopes", mode="before")
     @classmethod
     def normalize_function_scopes(cls, value: list[str] | None) -> list[str]:
@@ -77,8 +60,14 @@ class ExpenseAnalysisRowSchema(BaseModel):
     id: str
     label: str
     code: str | None = None
-    node_type: Literal["department", "cost_center", "category", "accounting_subject"]
+    node_type: Literal[
+        "department",
+        "cost_center",
+        "accounting_subject",
+        "control_department",
+    ]
     level: int
+    control_person: str | None = None
     current_actual: Decimal = Decimal("0")
     current_budget: Decimal = Decimal("0")
     current_variance: Decimal = Decimal("0")
@@ -111,6 +100,7 @@ class ExpenseAnalysisResponseSchema(BaseModel):
     available_data_source_categories: list[str] = Field(default_factory=list)
     department: ExpenseAnalysisDimensionSchema
     subject: ExpenseAnalysisDimensionSchema
+    control_department: ExpenseAnalysisDimensionSchema
 
 
 ExpenseAnalysisRowSchema.model_rebuild()

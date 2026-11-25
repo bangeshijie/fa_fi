@@ -1,22 +1,23 @@
 """费用分析聚合服务。"""
 
-import json
 from collections.abc import Iterable
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import and_, false, func, or_, select
+from sqlalchemy import func, select
 
 from app.api.v1.module_budget.budget_detail.model import BudgetDetailModel
 from app.api.v1.module_dimension.accounting_subject.model import AccountingSubjectModel
 from app.api.v1.module_dimension.cost_center.model import CostCenterModel
+from app.api.v1.module_dimension.subject_control_department_mapping.model import (
+    SubjectControlDepartmentMappingModel,
+)
 from app.api.v1.module_financial.accounting_voucher_detail.model import (
     AccountingVoucherDetailModel,
 )
 from app.api.v1.module_system.auth.schema import AuthSchema
 from app.api.v1.module_system.dept.model import DeptModel
 from app.api.v1.module_system.dept.service import DeptService
-from app.core.exceptions import CustomException
 from app.core.permission import Permission
 
 from .schema import (
@@ -30,13 +31,7 @@ ZERO = Decimal("0")
 
 
 class ExpenseAnalysisService:
-    """按部门和管理科目分类生成费用分析树。"""
-
-    SUBJECT_CATEGORY_FIELDS = (
-        AccountingSubjectModel.management_category_level1,
-        AccountingSubjectModel.management_category_level2,
-        AccountingSubjectModel.management_category_level3,
-    )
+    """按部门、会计科目和主控部门生成费用分析结果。"""
 
     @classmethod
     async def get_department_options_service(cls, auth: AuthSchema) -> list[dict[str, Any]]:
@@ -53,6 +48,7 @@ class ExpenseAnalysisService:
         comparison_year = query.year - 1
         department_ids = await cls._expand_department_ids(auth, query.department_ids)
         department_lookup = await cls._get_department_lookup(auth)
+        control_mapping_lookup = await cls._get_control_mapping_lookup(auth)
 
         actual_rows = await cls._aggregate_fact(
             auth=auth,
@@ -70,6 +66,16 @@ class ExpenseAnalysisService:
             is_actual=False,
             years=(query.year, comparison_year),
         )
+        cls._attach_control_mapping(
+            rows=actual_rows,
+            department_lookup=department_lookup,
+            mapping_lookup=control_mapping_lookup,
+        )
+        cls._attach_control_mapping(
+            rows=budget_rows,
+            department_lookup=department_lookup,
+            mapping_lookup=control_mapping_lookup,
+        )
 
         department_data = cls._collect_metrics(
             actual_rows=actual_rows,
@@ -83,11 +89,20 @@ class ExpenseAnalysisService:
             dimension="subject",
             current_year=query.year,
         )
+        control_department_data = cls._collect_metrics(
+            actual_rows=actual_rows,
+            budget_rows=budget_rows,
+            dimension="control_department",
+            current_year=query.year,
+        )
 
         department_rows, department_total = cls._build_department_tree(
             department_data, department_lookup, query.month
         )
-        subject_rows, subject_total = cls._build_subject_tree(subject_data, query.month)
+        subject_rows, subject_total = cls._build_subject_rows(subject_data, query.month)
+        control_department_rows, control_department_total = (
+            cls._build_control_department_rows(control_department_data, query.month)
+        )
 
         result = {
             "currency": "RMB",
@@ -97,6 +112,10 @@ class ExpenseAnalysisService:
             ),
             "department": {"rows": department_rows, "total": department_total},
             "subject": {"rows": subject_rows, "total": subject_total},
+            "control_department": {
+                "rows": control_department_rows,
+                "total": control_department_total,
+            },
         }
         return ExpenseAnalysisResponseSchema.model_validate(result).model_dump()
 
@@ -116,9 +135,6 @@ class ExpenseAnalysisService:
             AccountingSubjectModel.id.label("subject_id"),
             AccountingSubjectModel.code.label("subject_code"),
             AccountingSubjectModel.name.label("subject_name"),
-            AccountingSubjectModel.management_category_level1.label("category_level1"),
-            AccountingSubjectModel.management_category_level2.label("category_level2"),
-            AccountingSubjectModel.management_category_level3.label("category_level3"),
             CostCenterModel.id.label("cost_center_id"),
             CostCenterModel.code.label("cost_center_code"),
             CostCenterModel.name.label("cost_center_name"),
@@ -158,27 +174,79 @@ class ExpenseAnalysisService:
         if query.function_scopes:
             stmt = stmt.where(CostCenterModel.function_scope.in_(query.function_scopes))
 
-        category_condition = cls._category_condition(query.management_category_paths)
-        if category_condition is not None:
-            stmt = stmt.where(category_condition)
-
         stmt = stmt.group_by(*dimension_columns)
         stmt = await Permission(model=model, auth=auth).filter_query(stmt)
         result = await auth.db.execute(stmt)
         return [dict(row) for row in result.mappings().all()]
 
     @classmethod
-    def _category_condition(cls, paths: list[list[str]]) -> Any:
-        if not paths:
-            return None
-        conditions = []
-        for path in paths:
-            if not 1 <= len(path) <= len(cls.SUBJECT_CATEGORY_FIELDS):
-                continue
-            conditions.append(
-                and_(*[field == value for field, value in zip(cls.SUBJECT_CATEGORY_FIELDS, path)])
+    async def _get_control_mapping_lookup(
+        cls, auth: AuthSchema
+    ) -> dict[tuple[int, int], tuple[str, str]]:
+        result = await auth.db.execute(
+            select(
+                SubjectControlDepartmentMappingModel.accounting_subject_id,
+                SubjectControlDepartmentMappingModel.dept_id,
+                SubjectControlDepartmentMappingModel.control_department,
+                SubjectControlDepartmentMappingModel.control_person,
+            ).where(
+                SubjectControlDepartmentMappingModel.status == "0",
+                SubjectControlDepartmentMappingModel.is_deleted.is_(False),
             )
-        return or_(*conditions) if conditions else false()
+        )
+        return {
+            (int(row.accounting_subject_id), int(row.dept_id)): (
+                str(row.control_department),
+                str(row.control_person),
+            )
+            for row in result
+        }
+
+    @classmethod
+    def _attach_control_mapping(
+        cls,
+        rows: list[dict[str, Any]],
+        department_lookup: dict[int, dict[str, Any]],
+        mapping_lookup: dict[tuple[int, int], tuple[str, str]],
+    ) -> None:
+        for row in rows:
+            dept_id = row.get("dept_id")
+            organization_id = cls._get_level_two_department_id(
+                int(dept_id) if dept_id is not None else None,
+                department_lookup,
+            )
+            mapped = (
+                mapping_lookup.get((int(row["subject_id"]), organization_id))
+                if organization_id is not None
+                else None
+            )
+            row["control_department"], row["control_person"] = mapped or (
+                "未配置主控部门",
+                "未配置",
+            )
+
+    @staticmethod
+    def _get_level_two_department_id(
+        dept_id: int | None, department_lookup: dict[int, dict[str, Any]]
+    ) -> int | None:
+        """将实际部门归属到集团树的第二级组织（事业部）。"""
+        if dept_id is None:
+            return None
+        current_id = dept_id
+        visited: set[int] = set()
+        while current_id not in visited:
+            visited.add(current_id)
+            current = department_lookup.get(current_id)
+            if not current:
+                return None
+            parent_id = current.get("parent_id")
+            if parent_id is None:
+                return current_id
+            parent = department_lookup.get(int(parent_id))
+            if not parent or parent.get("parent_id") is None:
+                return current_id
+            current_id = int(parent_id)
+        return current_id
 
     @classmethod
     async def _expand_department_ids(
@@ -223,8 +291,8 @@ class ExpenseAnalysisService:
         budget_rows: Iterable[dict[str, Any]],
         dimension: str,
         current_year: int,
-    ) -> dict[tuple[int, ...], dict[str, Any]]:
-        data: dict[tuple[int, ...], dict[str, Any]] = {}
+    ) -> dict[tuple[Any, ...], dict[str, Any]]:
+        data: dict[tuple[Any, ...], dict[str, Any]] = {}
 
         def add_rows(
             rows: Iterable[dict[str, Any]], field: str, prior_field: str
@@ -232,6 +300,12 @@ class ExpenseAnalysisService:
             for row in rows:
                 if dimension == "department":
                     key = (int(row["dept_id"] or 0),)
+                elif dimension == "control_department":
+                    key = (
+                        str(row["control_department"] or "未配置主控部门"),
+                        str(row["control_person"] or "未配置"),
+                        int(row["subject_id"] or 0),
+                    )
                 else:
                     key = (int(row["subject_id"]),)
                 item = data.setdefault(
@@ -254,7 +328,7 @@ class ExpenseAnalysisService:
     @classmethod
     def _build_department_tree(
         cls,
-        data: dict[tuple[int, ...], dict[str, Any]],
+        data: dict[tuple[Any, ...], dict[str, Any]],
         department_lookup: dict[int, dict[str, Any]],
         month: int,
     ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
@@ -313,68 +387,95 @@ class ExpenseAnalysisService:
         return roots, total
 
     @classmethod
-    def _build_subject_tree(
-        cls, data: dict[tuple[int, ...], dict[str, Any]], month: int
+    def _build_subject_rows(
+        cls, data: dict[tuple[Any, ...], dict[str, Any]], month: int
     ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-        roots: list[dict[str, Any]] = []
-        nodes: dict[tuple[str, ...], dict[str, Any]] = {}
-
-        def ensure_category(path: list[str]) -> dict[str, Any]:
-            parent: dict[str, Any] | None = None
-            for index, label in enumerate(path, start=1):
-                key = tuple(path[:index])
-                node = nodes.get(key)
-                if node is None:
-                    node = cls._node(
-                        id=f"category:{json.dumps(key, ensure_ascii=False)}",
-                        label=label,
-                        code=None,
-                        node_type="category",
-                        level=index,
-                    )
-                    nodes[key] = node
-                    if parent is None:
-                        roots.append(node)
-                    else:
-                        parent["children"].append(node)
-                parent = node
-            assert parent is not None
-            return parent
-
+        rows: list[dict[str, Any]] = []
         for key, item in data.items():
             meta = item["meta"]
-            path = [
-                str(meta.get("category_level1") or "未分类"),
-                str(meta.get("category_level2") or "未分类"),
-                str(meta.get("category_level3") or "未分类"),
-            ]
-            parent = ensure_category(path)
-            subject_node = cls._node(
+            subject_row = cls._node(
                 id=f"accounting-subject:{key[0]}",
                 label=str(meta.get("subject_name") or "未命名科目"),
                 code=meta.get("subject_code"),
                 node_type="accounting_subject",
-                level=4,
+                level=1,
             )
             cls._set_metrics(
-                subject_node,
+                subject_row,
                 item["actual_months"],
                 item["budget_months"],
                 month,
                 item["prior_actual_months"],
                 item["prior_budget_months"],
             )
-            parent["children"].append(subject_node)
+            rows.append(subject_row)
 
-        for node in roots:
-            cls._finalize_tree(node, month)
-            cls._sort_tree(node)
-        total = cls._total_node(roots, "category", month)
-        return roots, total
+        rows.sort(key=lambda item: (item["label"], item.get("code") or ""))
+        total = cls._total_node(rows, "accounting_subject", month)
+        return rows, total
+
+    @classmethod
+    def _build_control_department_rows(
+        cls,
+        data: dict[tuple[Any, ...], dict[str, Any]],
+        month: int,
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        grouped: dict[tuple[str, str], dict[int, dict[str, Any]]] = {}
+        for item in data.values():
+            meta = item["meta"]
+            control_key = (
+                str(meta.get("control_department") or "未配置主控部门"),
+                str(meta.get("control_person") or "未配置"),
+            )
+            subject_id = int(meta.get("subject_id") or 0)
+            grouped.setdefault(control_key, {})[subject_id] = item
+
+        rows: list[dict[str, Any]] = []
+        for (control_department, control_person), subject_items in grouped.items():
+            row = cls._node(
+                id=f"control-department:{control_department}:{control_person}",
+                label=control_department,
+                code=None,
+                node_type="control_department",
+                level=1,
+                control_person=control_person,
+            )
+            for subject_id, item in subject_items.items():
+                meta = item["meta"]
+                subject_row = cls._node(
+                    id=f"control-department:{control_department}:{control_person}:subject:{subject_id}",
+                    label=str(meta.get("subject_name") or "未命名科目"),
+                    code=meta.get("subject_code"),
+                    node_type="accounting_subject",
+                    level=2,
+                    control_person=control_person,
+                )
+                cls._set_metrics(
+                    subject_row,
+                    item["actual_months"],
+                    item["budget_months"],
+                    month,
+                    item["prior_actual_months"],
+                    item["prior_budget_months"],
+                )
+                row["children"].append(subject_row)
+            cls._finalize_tree(row, month)
+            cls._sort_tree(row)
+            rows.append(row)
+
+        rows.sort(key=lambda item: (item["label"], item.get("control_person") or ""))
+        total = cls._total_node(rows, "control_department", month)
+        return rows, total
 
     @classmethod
     def _node(
-        cls, id: str, label: str, code: str | None, node_type: str, level: int
+        cls,
+        id: str,
+        label: str,
+        code: str | None,
+        node_type: str,
+        level: int,
+        control_person: str | None = None,
     ) -> dict[str, Any]:
         return {
             "id": id,
@@ -382,6 +483,7 @@ class ExpenseAnalysisService:
             "code": code,
             "node_type": node_type,
             "level": level,
+            "control_person": control_person,
             "children": [],
         }
 

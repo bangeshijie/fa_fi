@@ -186,7 +186,6 @@ class AccountingSubjectService:
             "管理三级分类",
             "管理科目一级分类",
             "管理科目二级分类",
-            "科目负责人",
             "状态",
             "备注",
         ]
@@ -213,7 +212,6 @@ class AccountingSubjectService:
             "管理三级分类": "management_category_level3",
             "管理科目一级分类": "management_category_level1",
             "管理科目二级分类": "management_category_level2",
-            "科目负责人": "leader",
             "状态": "status",
             "备注": "description",
         }
@@ -307,7 +305,6 @@ class AccountingSubjectService:
                         "management_category_level2": cls._excel_text(
                             row.get("management_category_level2")
                         ),
-                        "leader": cls._excel_text(row.get("leader")),
                         "status": status,
                         "description": cls._excel_text(row.get("description")),
                     }
@@ -389,7 +386,6 @@ class AccountingSubjectService:
             "management_category_level3": "管理三级分类",
             "management_category_level1": "管理科目一级分类",
             "management_category_level2": "管理科目二级分类",
-            "leader": "科目负责人",
             "status": "状态",
             "description": "备注",
             "created_time": "创建时间",

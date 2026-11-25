@@ -29,7 +29,6 @@ export interface ExpenseAnalysisQuery {
   company_ids?: number[]
   department_ids?: number[]
   function_scopes?: string[]
-  management_category_paths?: string[][]
   data_source_categories?: string[]
 }
 
@@ -37,8 +36,9 @@ export interface ExpenseAnalysisRow {
   id: string
   label: string
   code?: string | null
-  node_type: 'department' | 'cost_center' | 'category' | 'accounting_subject'
+  node_type: 'department' | 'cost_center' | 'accounting_subject' | 'control_department'
   level: number
+  control_person?: string | null
   current_actual: number | string
   current_budget: number | string
   current_variance: number | string
@@ -67,4 +67,5 @@ export interface ExpenseAnalysisResult {
   available_data_source_categories: string[]
   department: ExpenseAnalysisDimension
   subject: ExpenseAnalysisDimension
+  control_department: ExpenseAnalysisDimension
 }

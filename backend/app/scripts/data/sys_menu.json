@@ -2126,6 +2126,34 @@
           {"name":"查询会计科目","type":3,"icon":null,"order":9,"permission":"module_dimension:accounting_subject:query","route_name":null,"route_path":null,"component_path":null,"status":"0","keep_alive":true,"hidden":false,"always_show":false,"title":"查询会计科目","params":null,"affix":false,"redirect":null,"description":"初始化数据","client":"pc"}
         ],
         "client": "pc"
+      },
+      {
+        "name": "科目主控部门映射",
+        "type": 2,
+        "icon": "ri:git-merge-line",
+        "order": 4,
+        "permission": "module_dimension:subject_control_department_mapping:query",
+        "route_name": "SubjectControlDepartmentMapping",
+        "route_path": "subject-control-department-mapping",
+        "component_path": "module_dimension/subject_control_department_mapping/index",
+        "status": "0",
+        "keep_alive": true,
+        "hidden": false,
+        "always_show": false,
+        "title": "科目主控部门映射",
+        "params": null,
+        "affix": false,
+        "redirect": null,
+        "description": "初始化数据",
+        "children": [
+          {"name":"创建科目主控部门映射","type":3,"icon":null,"order":1,"permission":"module_dimension:subject_control_department_mapping:create","route_name":null,"route_path":null,"component_path":null,"status":"0","keep_alive":true,"hidden":false,"always_show":false,"title":"创建科目主控部门映射","params":null,"affix":false,"redirect":null,"description":"初始化数据","client":"pc"},
+          {"name":"修改科目主控部门映射","type":3,"icon":null,"order":2,"permission":"module_dimension:subject_control_department_mapping:update","route_name":null,"route_path":null,"component_path":null,"status":"0","keep_alive":true,"hidden":false,"always_show":false,"title":"修改科目主控部门映射","params":null,"affix":false,"redirect":null,"description":"初始化数据","client":"pc"},
+          {"name":"删除科目主控部门映射","type":3,"icon":null,"order":3,"permission":"module_dimension:subject_control_department_mapping:delete","route_name":null,"route_path":null,"component_path":null,"status":"0","keep_alive":true,"hidden":false,"always_show":false,"title":"删除科目主控部门映射","params":null,"affix":false,"redirect":null,"description":"初始化数据","client":"pc"},
+          {"name":"修改科目主控部门映射状态","type":3,"icon":null,"order":4,"permission":"module_dimension:subject_control_department_mapping:patch","route_name":null,"route_path":null,"component_path":null,"status":"0","keep_alive":true,"hidden":false,"always_show":false,"title":"修改科目主控部门映射状态","params":null,"affix":false,"redirect":null,"description":"初始化数据","client":"pc"},
+          {"name":"详情科目主控部门映射","type":3,"icon":null,"order":5,"permission":"module_dimension:subject_control_department_mapping:detail","route_name":null,"route_path":null,"component_path":null,"status":"0","keep_alive":true,"hidden":false,"always_show":false,"title":"详情科目主控部门映射","params":null,"affix":false,"redirect":null,"description":"初始化数据","client":"pc"},
+          {"name":"查询科目主控部门映射","type":3,"icon":null,"order":6,"permission":"module_dimension:subject_control_department_mapping:query","route_name":null,"route_path":null,"component_path":null,"status":"0","keep_alive":true,"hidden":false,"always_show":false,"title":"查询科目主控部门映射","params":null,"affix":false,"redirect":null,"description":"初始化数据","client":"pc"}
+        ],
+        "client": "pc"
       }
     ],
     "client": "pc"

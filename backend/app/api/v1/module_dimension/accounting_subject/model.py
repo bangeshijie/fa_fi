@@ -41,6 +41,3 @@ class AccountingSubjectModel(ModelMixin, UserMixin):
     management_category_level2: Mapped[str | None] = mapped_column(
         String(64), default=None, comment="管理科目二级分类"
     )
-    leader: Mapped[str | None] = mapped_column(
-        String(64), default=None, comment="科目负责人"
-    )

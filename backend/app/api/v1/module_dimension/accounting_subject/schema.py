@@ -27,7 +27,6 @@ class AccountingSubjectCreateSchema(BaseModel):
     management_category_level2: str | None = Field(
         default=None, max_length=64, description="管理科目二级分类"
     )
-    leader: str | None = Field(default=None, max_length=64, description="科目负责人")
     status: str = Field(default="0", description="状态(0:正常 1:停用)")
     description: str | None = Field(default=None, max_length=500, description="备注")
 
@@ -60,7 +59,6 @@ class AccountingSubjectCreateSchema(BaseModel):
         "management_category_level3",
         "management_category_level1",
         "management_category_level2",
-        "leader",
         "description",
         mode="before",
     )
@@ -147,14 +145,12 @@ class AccountingSubjectQueryParam:
         management_category_paths: list[str] | None = Query(
             None, description="管理分类层级路径(JSON数组，可多选)"
         ),
-        leader: str | None = Query(None, description="科目负责人"),
         status: str | None = Query(None, description="状态"),
     ) -> None:
         for field, value in {
             "code": code,
             "name": name,
             "accounting_statement_subject": accounting_statement_subject,
-            "leader": leader,
         }.items():
             if value and value.strip():
                 setattr(self, field, (QueueEnum.like.value, value.strip()))

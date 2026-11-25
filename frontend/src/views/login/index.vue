@@ -7,17 +7,10 @@
     <div class="login-card">
       <div class="brand">
         <div class="logo-icon">
-          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="2" width="28" height="28" rx="8" fill="white" fill-opacity="0.1" />
-            <path d="M10 10L16 16L22 10" stroke="white" stroke-width="2.5" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <path d="M10 16L16 22L22 16" stroke="white" stroke-width="2.5" stroke-linecap="round"
-              stroke-linejoin="round" />
-            <rect x="7" y="7" width="18" height="18" rx="3" stroke="white" stroke-width="1.5" />
-          </svg>
+          <img src="/logo.png" alt="财经管理平台 logo" />
         </div>
-        <h1 class="brand-title">FinPro</h1>
-        <p class="brand-sub">财务管理平台 · 安全高效</p>
+        <h1 class="brand-title">财经管理平台</h1>
+        <p class="brand-sub"> 精确 · 及时 · 安全 · 高效</p>
       </div>
 
       <el-form ref="loginFormRef" :model="loginForm" :rules="rules" class="login-form" @keyup.enter="handleLogin">
@@ -60,15 +53,15 @@
         <div class="oauth-divider"><span>第三方登录</span></div>
         <div class="oauth-actions">
           <el-button class="oauth-btn feishu-btn" :disabled="loading" @click="handleOAuthLogin('feishu')">
-            飞书登录
+            飞书登录(暂未开放)
           </el-button>
           <el-button class="oauth-btn wechat-btn" :disabled="loading" @click="handleOAuthLogin('wechat')">
-            微信登录
+            微信登录(暂未开放)
           </el-button>
         </div>
 
         <div class="register-hint">
-          还没有账号？ <a href="#" @click.prevent>立即注册</a>
+          还没有账号？ <a href="#" @click.prevent>立即注册(暂未开放)</a>
         </div>
       </el-form>
     </div>
@@ -384,12 +377,12 @@ onMounted(async () => {
   display: inline-flex;
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, #4f7cff, #7c3aed);
+  background: linear-gradient(135deg, var(--el-color-primary), var(--el-color-primary-dark-2));
   border-radius: 20px;
   align-items: center;
   justify-content: center;
   margin-bottom: 12px;
-  box-shadow: 0 12px 24px rgba(79, 124, 255, 0.3);
+  box-shadow: 0 12px 24px rgba(35, 173, 229, 0.3);
 
   svg {
     width: 32px;
@@ -433,8 +426,8 @@ onMounted(async () => {
     }
 
     &.is-focus {
-      border-color: #4f7cff;
-      box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.2);
+      border-color: var(--el-color-primary);
+      box-shadow: 0 0 0 3px rgba(35, 173, 229, 0.2);
       background: #ffffff;
     }
 
@@ -579,8 +572,8 @@ onMounted(async () => {
     }
 
     &.is-checked .el-checkbox__inner {
-      background: #4f7cff;
-      border-color: #4f7cff;
+      background: var(--el-color-primary);
+      border-color: var(--el-color-primary);
     }
   }
 
@@ -602,24 +595,24 @@ onMounted(async () => {
   width: 100%;
   height: 52px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #4f7cff, #7c3aed);
+  background: linear-gradient(135deg, var(--el-color-primary), var(--el-color-primary-dark-2));
   border: none;
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 1px;
   color: #fff;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 24px rgba(79, 124, 255, 0.3);
+  box-shadow: 0 8px 24px rgba(35, 173, 229, 0.3);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(79, 124, 255, 0.4);
-    background: linear-gradient(135deg, #5a87ff, #8b4fff);
+    box-shadow: 0 12px 32px rgba(35, 173, 229, 0.4);
+    background: linear-gradient(135deg, #42b9e8, #2d68dc);
   }
 
   &:active {
     transform: translateY(0);
-    box-shadow: 0 4px 12px rgba(79, 124, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(35, 173, 229, 0.3);
   }
 
   &.is-loading {
@@ -716,7 +709,9 @@ onMounted(async () => {
 /* 高清屏优化 - 如果使用 2x 图片 */
 @media (-webkit-min-device-pixel-ratio: 2),
 (min-resolution: 192dpi) {
-  .login-root { background-image: url('@/assets/images/background.jpg'); }
+  .login-root {
+    background-image: url('@/assets/images/background.jpg');
+  }
 }
 
 .oauth-divider {
@@ -759,6 +754,59 @@ onMounted(async () => {
   }
 }
 
-.feishu-btn:hover { border-color: #4c9aff; }
-.wechat-btn:hover { border-color: #36c95f; }
+.feishu-btn:hover {
+  border-color: var(--el-color-primary);
+}
+
+.wechat-btn:hover {
+  border-color: var(--el-color-primary);
+}
+
+/* 保持原登录页布局，仅使用正式 logo 并将卡片轻微右移。 */
+.logo-icon img {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 20px;
+  object-fit: cover;
+}
+
+.login-card {
+  position: absolute;
+  top: 50%;
+  left: min(87.5%, calc(100% - 220px));
+  margin: 0;
+  transform: translate(-50%, -50%);
+}
+
+.login-card:hover {
+  transform: translate(-50%, calc(-50% - 4px));
+}
+
+.login-footer {
+  position: absolute;
+  left: min(87.5%, calc(100% - 220px));
+  bottom: 24px;
+  margin: 0;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 760px) {
+
+  .login-card,
+  .login-card:hover {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: translateY(0);
+  }
+
+  .login-footer {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    margin-top: 32px;
+    transform: none;
+  }
+}
 </style>

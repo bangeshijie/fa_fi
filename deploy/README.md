@@ -1,4 +1,4 @@
-# FA-FI-MS 生产部署
+# FA-FI 生产部署
 
 生产环境采用宿主机 Nginx 提供前端静态文件，Docker Compose 运行 PostgreSQL、Redis、Alembic migration 和后端。
 
